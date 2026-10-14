@@ -1,0 +1,85 @@
+{
+ "title": {
+  "it": "Quizzone scientifico",
+  "en": "Science Quiz"
+ },
+ "series": "Contromossa",
+ "defaults": {
+  "time_s": 30,
+  "points": 100,
+  "penalty": 50,
+  "speed_bonus": 50
+ },
+ "questions": [
+  {
+   "id": "atmo",
+   "correct": 1,
+   "time_s": 20,
+   "category": {
+    "it": "Terra",
+    "en": "Earth"
+   }
+  },
+  {
+   "id": "polpo",
+   "correct": 2,
+   "time_s": 20,
+   "category": {
+    "it": "Biologia",
+    "en": "Biology"
+   }
+  },
+  {
+   "id": "giove",
+   "correct": 1,
+   "time_s": 20,
+   "category": {
+    "it": "Astronomia",
+    "en": "Astronomy"
+   }
+  },
+  {
+   "id": "anemo",
+   "correct": 2,
+   "category": {
+    "it": "Meteorologia",
+    "en": "Meteorology"
+   }
+  },
+  {
+   "id": "elettrone",
+   "correct": 2,
+   "category": {
+    "it": "Fisica",
+    "en": "Physics"
+   }
+  },
+  {
+   "id": "bollitura",
+   "correct": 1,
+   "category": {
+    "it": "Fisica",
+    "en": "Physics"
+   }
+  },
+  {
+   "id": "sodio",
+   "correct": 2,
+   "category": {
+    "it": "Chimica",
+    "en": "Chemistry"
+   }
+  },
+  {
+   "id": "nobel",
+   "correct": 1,
+   "time_s": 40,
+   "points": 150,
+   "penalty": 75,
+   "category": {
+    "it": "Storia della scienza",
+    "en": "History of science"
+   }
+  }
+ ]
+}

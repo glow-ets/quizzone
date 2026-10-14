@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz - controllo</title>
+<link rel="stylesheet" href="/static/theme.css">
+</head>
+<body>
+<div class="ctl">
+  <header>
+    <h1 id="h-title"></h1>
+    <div class="row">
+      <span class="pill" id="p-link"></span><span class="pill" id="p-base"></span>
+      <label class="muted" for="lang" data-i="ctl.language"></label>
+      <select id="lang"></select>
+      <a class="btn" id="csv" data-i="ctl.export"></a>
+    </div>
+  </header>
+
+  <section class="panel now" aria-labelledby="h-now">
+    <h2 id="h-now" data-i="ctl.now"></h2>
+    <div class="row"><span class="pill" id="p-phase"></span><span id="progress" class="muted"></span><span id="answered"></span><span id="timer" class="muted"></span></div>
+    <div class="q" id="qtext"></div>
+    <div class="row" id="actions"></div>
+    <div class="row muted" id="hint"></div>
+  </section>
+
+  <div class="cols">
+    <section class="panel" aria-labelledby="h-teams"><h2 id="h-teams" data-i="ctl.teams"></h2><div id="teams"></div></section>
+    <section class="panel" aria-labelledby="h-dev"><h2 id="h-dev" data-i="ctl.devices"></h2><div class="row" style="margin-bottom:8px">
+        <button class="btn" id="auto" data-i="ctl.auto_assign"></button></div><div id="devices"></div></section>
+  </div>
+
+  <div class="cols">
+    <section class="panel" aria-labelledby="h-test"><h2 id="h-test" data-i="ctl.test"></h2>
+      <p class="muted" data-i="ctl.test_help"></p>
+      <div class="row"><button class="btn" id="blast" data-i="ctl.test_run"></button></div><div id="report"></div></section>
+    <section class="panel" aria-labelledby="h-cfg"><h2 id="h-cfg" data-i="ctl.settings"></h2><div id="cfg"></div>
+      <div class="row" style="margin-top:12px"><button class="btn danger" id="reset" data-i="ctl.reset"></button></div></section>
+    <section class="panel" aria-labelledby="h-log"><h2 id="h-log" data-i="ctl.log"></h2><div class="log" id="log"></div></section>
+  </div>
+</div>
+<div class="toast hidden" id="toast" role="alert"></div>
+<script src="/static/common.js"></script>
+<script src="/static/control.js"></script>
+</body>
+</html>

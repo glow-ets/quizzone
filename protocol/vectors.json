@@ -1,0 +1,113 @@
+{
+ "_comment": "Hand-computed vectors shared by the Python and Node test suites. Radio payloads are hex; serial lines carry an XOR checksum of everything before '*'.",
+ "radio": [
+  {
+   "name": "state",
+   "hex": "c501062a0703341205012c0102",
+   "msg": {
+    "type": 1,
+    "slot": 6,
+    "seq": 42,
+    "q": 7,
+    "ans": 3,
+    "elapsed": 4660,
+    "flags": 5,
+    "fw": 1,
+    "presses": 300,
+    "bmiss": 2
+   }
+  },
+  {
+   "name": "beacon",
+   "hex": "c5020107dc052c010500000000001055",
+   "msg": {
+    "type": 2,
+    "phase": 1,
+    "q": 7,
+    "elapsed": 1500,
+    "limit": 300,
+    "ack": 5,
+    "correct": 0,
+    "wrong": 0,
+    "flags": 16,
+    "bseq": 85
+   }
+  },
+  {
+   "name": "assign",
+   "hex": "c5034d3c2b1a05",
+   "msg": {
+    "type": 3,
+    "target": 439041101,
+    "arg": 5
+   }
+  },
+  {
+   "name": "ident",
+   "hex": "c5044d3c2b1a02",
+   "msg": {
+    "type": 4,
+    "target": 439041101,
+    "arg": 2
+   }
+  },
+  {
+   "name": "assign_negative_serial",
+   "hex": "c503ffffffff0f",
+   "msg": {
+    "type": 3,
+    "target": -1,
+    "arg": 15
+   }
+  }
+ ],
+ "radio_invalid_hex": [
+  "",
+  "c5",
+  "c5ff",
+  "c501",
+  "c501062a0703341205012c01",
+  "c501062a0703341205012c010200",
+  "c4010000000000000000000000",
+  "c5020107dc052c0105000000000010",
+  "c503aabbccdd",
+  "c9"
+ ],
+ "serial": [
+  {
+   "payload": "P",
+   "line": "P*50"
+  },
+  {
+   "payload": "H 1 77 25 65 0 0 0 71",
+   "line": "H 1 77 25 65 0 0 0 71*4B"
+  },
+  {
+   "payload": "S 1 7 1500 30000 5 0 0 16",
+   "line": "S 1 7 1500 30000 5 0 0 16*50"
+  },
+  {
+   "payload": "A 1A2B3C4D 5",
+   "line": "A 1A2B3C4D 5*74"
+  },
+  {
+   "payload": "N FFFFFFFF 2",
+   "line": "N FFFFFFFF 2*7C"
+  },
+  {
+   "payload": "T 1A2B3C4D -62 6 42 7 3 4660 5 1 300 2 123456",
+   "line": "T 1A2B3C4D -62 6 42 7 3 4660 5 1 300 2 123456*4F"
+  }
+ ],
+ "serial_invalid": [
+  "",
+  "*",
+  "P",
+  "P*",
+  "P*5",
+  "P*51",
+  "P*5G",
+  "Px50",
+  "S 1 7 1500 30000 5 0 0 16*00"
+ ]
+}

@@ -1,0 +1,20 @@
+{
+    "name": "contromossa-team",
+    "version": "0.1.0",
+    "description": "Contromossa quiz - team device",
+    "dependencies": {
+        "core": "*",
+        "radio": "*"
+    },
+    "files": [
+        "README.md",
+        "qz_config.ts",
+        "qz_protocol.ts",
+        "qz_team.ts",
+        "main.ts"
+    ],
+    "supportedTargets": [
+        "microbit"
+    ],
+    "preferredEditor": "tsprj"
+}

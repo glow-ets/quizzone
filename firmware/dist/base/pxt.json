@@ -1,0 +1,20 @@
+{
+    "name": "contromossa-base",
+    "version": "0.1.0",
+    "description": "Contromossa quiz - base station (plug into the PC)",
+    "dependencies": {
+        "core": "*",
+        "radio": "*"
+    },
+    "files": [
+        "README.md",
+        "qz_config.ts",
+        "qz_protocol.ts",
+        "qz_base.ts",
+        "main.ts"
+    ],
+    "supportedTargets": [
+        "microbit"
+    ],
+    "preferredEditor": "tsprj"
+}

@@ -1,0 +1,83 @@
+{
+ "atmo": {
+  "text": "Quale gas è il più abbondante nell'atmosfera terrestre?",
+  "answers": [
+   "Ossigeno",
+   "Azoto",
+   "Anidride carbonica",
+   "Argon"
+  ],
+  "explanation": "L'azoto costituisce circa il 78% dell'aria; l'ossigeno circa il 21%."
+ },
+ "polpo": {
+  "text": "Quanti cuori ha un polpo?",
+  "answers": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ],
+  "explanation": "Ne ha tre: due branchiali e uno sistemico."
+ },
+ "giove": {
+  "text": "Qual è il pianeta più grande del Sistema solare?",
+  "answers": [
+   "Saturno",
+   "Giove",
+   "Nettuno",
+   "Urano"
+  ],
+  "explanation": "Giove ha un diametro di circa 140.000 km, più di undici volte quello della Terra."
+ },
+ "anemo": {
+  "text": "Che cosa misura un anemometro?",
+  "answers": [
+   "La pressione atmosferica",
+   "L'umidità dell'aria",
+   "La velocità del vento",
+   "La temperatura",
+   "La radiazione solare"
+  ],
+  "explanation": "L'anemometro misura la velocità del vento."
+ },
+ "elettrone": {
+  "text": "Quale particella ha carica elettrica negativa?",
+  "answers": [
+   "Protone",
+   "Neutrone",
+   "Elettrone",
+   "Fotone"
+  ],
+  "explanation": "L'elettrone ha carica negativa, il protone positiva; neutrone e fotone sono neutri."
+ },
+ "bollitura": {
+  "text": "A quale temperatura bolle l'acqua al livello del mare, a pressione normale?",
+  "answers": [
+   "90 °C",
+   "100 °C",
+   "110 °C",
+   "120 °C"
+  ],
+  "explanation": "A 1 atmosfera l'acqua pura bolle a 100 °C; in quota la temperatura di ebollizione scende."
+ },
+ "sodio": {
+  "text": "Qual è il simbolo chimico del sodio?",
+  "answers": [
+   "So",
+   "Sd",
+   "Na",
+   "N"
+  ],
+  "explanation": "Na deriva dal latino «natrium»."
+ },
+ "nobel": {
+  "text": "Quale scienziata ha vinto due premi Nobel in discipline scientifiche diverse?",
+  "answers": [
+   "Rosalind Franklin",
+   "Marie Curie",
+   "Rita Levi-Montalcini",
+   "Lise Meitner"
+  ],
+  "explanation": "Marie Curie: Nobel per la Fisica nel 1903 e per la Chimica nel 1911."
+ }
+}

@@ -1,0 +1,16 @@
+{
+    "name": "contromossa-probe",
+    "version": "0.1.0",
+    "description": "Contromossa quiz - pin probe / self-test",
+    "dependencies": {
+        "core": "*"
+    },
+    "files": [
+        "README.md",
+        "main.ts"
+    ],
+    "supportedTargets": [
+        "microbit"
+    ],
+    "preferredEditor": "tsprj"
+}
