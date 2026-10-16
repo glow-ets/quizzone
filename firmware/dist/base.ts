@@ -457,8 +457,16 @@ serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
 
 // Display: never use basic.showString / showLeds here. They block for hundreds of milliseconds, and this
 // loop also sends the beacons and forwards the team packets to the PC: a blocked loop means a deaf base.
-const QZ_BASE_Q = [".###.", "#...#", "#.#.#", "#..##", ".####"];
-const QZ_BASE_NOSERVER = [".##.#", "#..##", "#..##", ".##..", "..###"];
+const QZ_BASE_Q = [".##..", 
+                   "#..#.", 
+                   "#..#.", 
+                   ".##..", 
+                   "..##."];
+const QZ_BASE_NOSERVER = [".##.#", 
+                          "#..##", 
+                          "#..##", 
+                          ".##..", 
+                          "..###"];
 let qzBaseLastFrame = "";
 
 function qzBaseDraw(rows: string[]) {
