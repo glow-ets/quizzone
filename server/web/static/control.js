@@ -50,6 +50,9 @@ function render() {
   paint("devices", devicesHtml(s));
   paint("dev-extra", deviceExtraHtml(s));
   paint("cfg", cfgHtml(s));
+  const diff = cfgChanged(s);
+  $("reset-cfg").disabled = !diff.length;
+  $("cfg-legend").textContent = diff.length ? t("cfg.legend_changed", { n: diff.length }) : t("cfg.legend_default");
   paint("report", reportHtml(s));
   paint("log", s.log.slice().reverse().map(l => `<div class="${l.l === "warn" ? "warn" : ""}">${new Date(l.t * 1000).toLocaleTimeString()} ${esc(t(l.k, l.a))}</div>`).join(""));
 }
@@ -95,10 +98,13 @@ function deviceExtraHtml(s) {
     <select id="add-slot" aria-label="${esc(t("ctl.team"))}"><option value="">–</option>${s.teams.map(team).join("")}</select>
     <button class="btn" id="add-btn">${esc(t("ctl.add"))}</button></div>`;
 }
+const CFG_SHOWN = ["close_when_all_answered", "read_first", "allow_negative", "auto_assign", "teams", "no_answer_penalty", "tolerance_ms", "settle_max_ms"];
+function cfgChanged(s) { return CFG_SHOWN.filter(k => s.config_defaults && s.config[k] !== s.config_defaults[k]); }
 function cfgHtml(s) {
-  const c = s.config;
-  const chk = (k) => `<label class="row"><input type="checkbox" data-cfg="${k}" ${c[k] ? "checked" : ""}> ${esc(t("cfg." + k))}</label>`;
-  const num = (k, min, max) => `<label class="row">${esc(t("cfg." + k))} <input class="n" type="number" data-cfgnum="${k}" min="${min}" max="${max}" value="${c[k]}"></label>`;
+  const c = s.config, d = s.config_defaults || {};
+  const hint = k => c[k] === d[k] ? "" : ` <span class="def">${esc(t("cfg.default", { v: typeof d[k] === "boolean" ? t(d[k] ? "cfg.on" : "cfg.off") : d[k] }))}</span>`;
+  const chk = (k) => `<label class="row ${c[k] === d[k] ? "" : "changed"}"><input type="checkbox" data-cfg="${k}" ${c[k] ? "checked" : ""}> ${esc(t("cfg." + k))}${hint(k)}</label>`;
+  const num = (k, min, max) => `<label class="row ${c[k] === d[k] ? "" : "changed"}">${esc(t("cfg." + k))} <input class="n" type="number" data-cfgnum="${k}" min="${min}" max="${max}" value="${c[k]}">${hint(k)}</label>`;
   return chk("close_when_all_answered") + chk("read_first") + chk("allow_negative") + chk("auto_assign") +
     num("teams", 1, 16) + num("no_answer_penalty", 0, 100000) + num("tolerance_ms", 0, 2000) + num("settle_max_ms", 500, 10000);
 }
@@ -131,14 +137,19 @@ document.addEventListener("click", ev => {
   }
   if (b.id === "auto") return run("auto_assign");
   if (b.id === "blast") return run("test", { seconds: 6 });
+  if (b.id === "reset-cfg") return run("reset_config", {}, "confirm.reset_cfg");
   if (b.id === "reset") { if (confirm(t("confirm.reset"))) run("reset_game", { confirm: true }); }
 });
 document.addEventListener("change", ev => {
   const el = ev.target;
   if (el.dataset.name !== undefined) run("rename", { slot: +el.dataset.name, name: el.value });
   else if (el.dataset.assign) { if (el.value !== "") run("assign", { serial: el.dataset.assign, slot: +el.value }); else run("unassign", { serial: el.dataset.assign }); }
-  else if (el.dataset.cfg) run("config", { [el.dataset.cfg]: el.checked });
-  else if (el.dataset.cfgnum) run("config", { [el.dataset.cfgnum]: parseInt(el.value, 10) });
+  else if (el.dataset.cfg || el.dataset.cfgnum) {
+    const k = el.dataset.cfg || el.dataset.cfgnum, v = el.dataset.cfg ? el.checked : parseInt(el.value, 10);
+    run("config", { [k]: v });
+    // highlight at once; the panel itself is not repainted while the operator is still inside one of its inputs
+    if (S && S.config_defaults) el.closest("label").classList.toggle("changed", v !== S.config_defaults[k]);
+  }
   rendered = {};      // force repaint from the next snapshot
 });
 (async function () {

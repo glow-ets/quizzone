@@ -152,3 +152,7 @@ label.row input[type=checkbox] { flex: none; width: 18px; height: 18px; }
 .qans li .key { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--bg-3); font-weight: 800; }
 .qans li.right { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 20%, var(--bg-2)); }
 .qans li .tick { margin-left: auto; color: var(--ok); }
+
+/* settings that differ from the default */
+label.changed { color: var(--glow); font-weight: 700; }
+label.changed .def { font-weight: 400; color: var(--muted); }

@@ -141,5 +141,14 @@
  "q.correct": "Correct answer",
  "q.meta": "{s} s · {p} points · penalty {n}",
  "q.too_many": "More than {n} answers: does not fit the keys",
- "ctl.questions": "Questions"
+ "ctl.questions": "Questions",
+ "ctl.reset_cfg": "Reset settings",
+ "confirm.reset_cfg": "Restore every setting to its default? Scores and devices are not affected.",
+ "cfg.default": "(default: {v})",
+ "cfg.on": "on",
+ "cfg.off": "off",
+ "cfg.legend_changed": "{n} settings differ from the default (highlighted).",
+ "cfg.legend_default": "All settings are at their defaults.",
+ "log.config_reset": "Settings restored to their defaults",
+ "log.config_reset_teams_kept": "Settings restored; the number of teams is unchanged because devices are assigned beyond the default"
 }

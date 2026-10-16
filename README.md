@@ -39,6 +39,8 @@ scadere) -> *Mostra la risposta* -> *Prossima domanda*. Alla fine *Vai alla clas
 Risposte per domanda: i dispositivi hanno 4 tasti, quindi il server accetta al massimo 4 risposte per domanda
 (`--options N`, da 3 a 5, default 4; non serve toccare il firmware). All'avvio (e con `validate`) il contenuto viene
 controllato: se una domanda ha piu' risposte il server non parte e dice quale. Il valore e' mostrato nel pannello di controllo.
+Nel pannello, le impostazioni diverse dal predefinito sono evidenziate (con il valore predefinito accanto);
+*Ripristina impostazioni* (vicino ad *Azzera partita*) le riporta tutte al predefinito senza toccare punteggi e dispositivi.
 Se il server si ferma, riavvialo: punteggi, squadre e domanda in corso vengono ripresi da `data/state.json`.
 
 ## Domande e traduzioni

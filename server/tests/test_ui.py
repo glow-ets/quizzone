@@ -127,6 +127,29 @@ class UiSmoke(unittest.TestCase):
         ctl.wait_for_function("document.querySelector('#devices').innerText.includes('0000ABCD')")
         self.assertEqual([m for m in errs if "409" not in m], [])
 
+    def test_reset_settings_button_and_highlight_of_changed_values(self):
+        ctl, errs = self.page(1280, 900, "/control")
+        ctl.wait_for_selector("input[data-cfgnum=tolerance_ms]")
+        self.assertEqual(ctl.locator("label.changed").count(), 0)
+        self.assertTrue(ctl.is_disabled("#reset-cfg"))
+        ctl.fill("input[data-cfgnum=tolerance_ms]", "900"); ctl.press("input[data-cfgnum=tolerance_ms]", "Tab")
+        ctl.wait_for_selector("label.changed")
+        self.assertEqual(ctl.locator("label.changed").count(), 1)
+        ctl.click("h1")                                                   # leave the input: the panel repaints
+        ctl.wait_for_function("document.querySelector('label.changed .def')")
+        self.assertIn("300", ctl.inner_text("label.changed"))             # the default is shown next to it
+        ctl.locator("input[data-cfg=allow_negative]").uncheck()
+        ctl.wait_for_function("document.querySelectorAll('label.changed').length === 2")
+        self.assertFalse(ctl.is_disabled("#reset-cfg"))
+        color = lambda sel: ctl.evaluate(f"getComputedStyle(document.querySelector('{sel}')).color")
+        self.assertNotEqual(color("label.changed"), color("#cfg label:not(.changed)"))
+        ctl.once("dialog", lambda d: d.accept())
+        ctl.click("#reset-cfg")
+        ctl.wait_for_function("document.querySelectorAll('label.changed').length === 0")
+        self.assertEqual(ctl.input_value("input[data-cfgnum=tolerance_ms]"), "300")
+        self.assertTrue(ctl.is_disabled("#reset-cfg"))
+        self.assertEqual([m for m in errs if "409" not in m], [])
+
     def test_questions_page_is_hidden_until_shown_and_hides_again(self):
         first = self.e.quiz.localized(self.e.quiz.questions[0], "it")["text"]
         pg, errs = self.page(1280, 900, "/questions?autohide=4")

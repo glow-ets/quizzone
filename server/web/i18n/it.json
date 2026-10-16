@@ -141,5 +141,14 @@
  "q.correct": "Risposta corretta",
  "q.meta": "{s} s · {p} punti · penalità {n}",
  "q.too_many": "Più di {n} risposte: non entra nei tasti",
- "ctl.questions": "Domande"
+ "ctl.questions": "Domande",
+ "ctl.reset_cfg": "Ripristina impostazioni",
+ "confirm.reset_cfg": "Riportare tutte le impostazioni ai valori predefiniti? Punteggi e dispositivi non cambiano.",
+ "cfg.default": "(predefinito: {v})",
+ "cfg.on": "sì",
+ "cfg.off": "no",
+ "cfg.legend_changed": "{n} impostazioni diverse dal predefinito (evidenziate).",
+ "cfg.legend_default": "Tutte le impostazioni sono quelle predefinite.",
+ "log.config_reset": "Impostazioni ripristinate ai valori predefiniti",
+ "log.config_reset_teams_kept": "Impostazioni ripristinate; il numero di squadre resta invariato perché ci sono dispositivi assegnati oltre il valore predefinito"
 }

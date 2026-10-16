@@ -741,6 +741,19 @@ class Engine:
                 setattr(self.cfg, k, v)
             self._persist(self.clock())
 
+    def cmd_reset_config(self, **_):
+        """Back to the default settings (scores, devices and names are untouched)."""
+        with self.lock:
+            defaults = Config()
+            keep_teams = any(sl >= defaults.teams for sl in self.slot_owner)
+            for k, v in defaults.to_dict().items():
+                if k == "teams" and keep_teams:
+                    continue                      # slots above the default are in use: never orphan a device
+                setattr(self.cfg, k, v)
+            self._state_dirty = True
+            self._log("log.config_reset_teams_kept" if keep_teams else "log.config_reset", "warn")
+            self._persist(self.clock())
+
     def cmd_reset_game(self, confirm: bool = False, **_):
         with self.lock:
             if confirm is not True:
@@ -914,6 +927,7 @@ class Engine:
                     self.devices.values(), key=lambda d: (d.slot is None, d.slot if d.slot is not None else 0, d.serial))]
                 snap["dismissed"] = [{"serial": f"{k:08X}", "slot": v.get("slot")} for k, v in sorted(self.dismissed.items())]
                 snap["config"] = self.cfg.to_dict()
+                snap["config_defaults"] = Config().to_dict()
                 snap["max_options"] = self.max_options
                 snap["unconfirmed"] = [s + 1 for s in self.unconfirmed]
                 snap["unsynced"] = sorted(d.slot + 1 for d in self.devices.values()

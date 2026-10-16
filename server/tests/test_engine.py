@@ -546,6 +546,52 @@ class Content(unittest.TestCase):
                 self.assertIn(needle, msg)
 
 
+class ResetConfig(unittest.TestCase):
+    def test_reset_restores_defaults_and_keeps_game_state(self):
+        e, clock, wall, sent = make_engine(4)
+        bring_online(e, clock, 4)
+        e.cmd_config(tolerance_ms=900, allow_negative=False, no_answer_penalty=20, auto_assign=True)
+        e.cmd_adjust(slot=1, delta=70)
+        e.cmd_rename(slot=0, name="Alfa")
+        self.assertNotEqual(e.cfg.to_dict(), Config().to_dict())
+        e.cmd_reset_config()
+        d = Config().to_dict()
+        self.assertEqual({k: v for k, v in e.cfg.to_dict().items() if k != "teams"}, {k: v for k, v in d.items() if k != "teams"})
+        self.assertEqual(e.cfg.teams, d["teams"])
+        self.assertEqual(e.scores[1], 70)
+        self.assertEqual(e.names[0], "Alfa")
+        self.assertEqual(len(e.devices), 4)
+
+    def test_control_snapshot_carries_the_defaults(self):
+        e, *_ = make_engine(4)
+        snap = e.snapshot("control")
+        self.assertEqual(snap["config_defaults"], Config().to_dict())
+        self.assertNotIn("config_defaults", e.snapshot("screen"))
+
+    def test_reset_never_orphans_a_device_above_the_default_team_count(self):
+        e, clock, wall, sent = make_engine(16)
+        e.handle_line(t_line(1, 255, 0)); e.cmd_assign(serial="1", slot=15)
+        e.cmd_reset_config()
+        self.assertEqual(e.cfg.teams, 16)
+        self.assertEqual(e.log[-1]["k"], "log.config_reset_teams_kept")
+
+    def test_reset_survives_a_restart(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "s.json")
+            e, *_ = make_engine(4, store_path=path)
+            e.cmd_config(tolerance_ms=900)
+            e.cmd_reset_config()
+            e._persist(e.clock())
+            e2, *_ = make_engine(4, store_path=path)
+            self.assertEqual(e2.cfg.tolerance_ms, Config().tolerance_ms)
+
+    def test_reset_via_command_dispatch(self):
+        e, *_ = make_engine(4)
+        e.cmd_config(settle_max_ms=5000)
+        e.command("reset_config", {})
+        self.assertEqual(e.cfg.settle_max_ms, Config().settle_max_ms)
+
+
 if __name__ == "__main__":
     unittest.main()
 
