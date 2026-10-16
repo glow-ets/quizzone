@@ -145,6 +145,32 @@ class UiSmoke(unittest.TestCase):
         self.assertEqual(self.overflow(scr), [0, 0])
         self.assertEqual(errs, [])
 
+    def test_final_scoreboard_has_trophies_dense_ranks_and_fits_the_screen(self):
+        from quizzone import engine as E
+        e = self.e
+        saved = (e.phase, dict(e.scores), e.q, e.cursor)
+        scores = [226, 92, 10] + [0] * 9 + [-128, -146, -225]
+        try:
+            with e.lock:
+                e.cfg.allow_negative = True
+                e.scores = {i: v for i, v in enumerate(scores)}
+                e.phase, e.q = E.FINAL, None
+                e._bump()
+            scr, errs = self.page(1920, 1080, "/")
+            scr.wait_for_selector(".hero")
+            self.assertEqual(scr.locator(".hero").count(), 3)
+            self.assertEqual(scr.locator(".hero .trophy-svg").count(), 3)
+            ranks = [int(x) for x in scr.eval_on_selector_all(".prow .rk", "els => els.map(e => e.textContent)")]
+            self.assertEqual(ranks, [4] * 9 + [5, 6, 7], "equal scores share a rank and the next one follows: no jump from 4 to 12")
+            self.assertEqual(self.overflow(scr), [0, 0])
+            self.assertEqual(scr.evaluate("document.querySelector('.podium').getBoundingClientRect().bottom <= innerHeight"), True)
+            self.assertEqual(errs, [])
+        finally:
+            with e.lock:
+                e.cfg.allow_negative = False
+                e.phase, e.scores, e.q, e.cursor = saved[0], saved[1], saved[2], saved[3]
+                e._bump()
+
     def test_reset_settings_button_and_highlight_of_changed_values(self):
         ctl, errs = self.page(1280, 900, "/control")
         ctl.wait_for_selector("input[data-cfgnum=tolerance_ms]")
