@@ -15,6 +15,8 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 REFERENCE_LANG = "it"
+DEFAULT_MAX_OPTIONS = 4  # answer keys physically available on a team device (server --options)
+MIN_OPTIONS, MAX_OPTIONS = 3, 5
 MAX_TIME_S = 60          # elapsed time travels as uint16 milliseconds
 
 
@@ -139,3 +141,13 @@ def load_quiz(content_dir: str) -> Quiz:
     if problems:
         raise ContentError(problems)
     return Quiz(title=raw.get("title", {}), series=raw.get("series", ""), questions=questions, texts=texts)
+
+
+def options_problems(quiz: Quiz, max_options: int) -> List[str]:
+    """Questions that offer more answers than the team devices have keys for (empty list = content fits)."""
+    out = []
+    for i, q in enumerate(quiz.questions):
+        if q.n_answers > max_options:
+            out.append(f"question #{i + 1} ({q.id}) has {q.n_answers} answers, "
+                       f"but only {max_options} answer keys are supported (--options {max_options})")
+    return out

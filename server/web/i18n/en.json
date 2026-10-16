@@ -23,6 +23,7 @@
  "ctl.link_ok": "Base connected ({d})",
  "ctl.link_down": "Base not connected {d}",
  "ctl.base": "Group {g}, band {b}, dropped {o}",
+ "ctl.options": "Answer options: {n}",
  "ctl.base_none": "Base: no message yet",
  "ctl.server_lost": "Server unreachable",
  "ctl.waiting_final": "Waiting for final confirmation from devices...",

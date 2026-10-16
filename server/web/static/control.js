@@ -31,6 +31,7 @@ function render() {
     b.textContent = t("ctl.base", { g: s.base.group, b: s.base.band, o: s.base.overflow });
     b.className = "pill " + (bad || s.base.overflow > 0 ? "warn" : "ok");
   } else { b.textContent = t("ctl.base_none"); b.className = "pill warn"; }
+  $("p-opts").textContent = t("ctl.options", { n: s.max_options });
   const sel = $("lang");
   if (!sel.dataset.ready) { sel.innerHTML = s.languages.map(l => `<option value="${esc(l)}">${esc(l)}</option>`).join(""); sel.dataset.ready = 1; sel.onchange = () => run("set_lang", { lang: sel.value }); }
   if (document.activeElement !== sel) sel.value = s.lang;

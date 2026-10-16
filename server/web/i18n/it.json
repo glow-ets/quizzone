@@ -23,6 +23,7 @@
  "ctl.link_ok": "Base collegata ({d})",
  "ctl.link_down": "Base non collegata {d}",
  "ctl.base": "Gruppo {g}, banda {b}, perse {o}",
+ "ctl.options": "Opzioni di risposta: {n}",
  "ctl.base_none": "Base: nessun messaggio",
  "ctl.server_lost": "Server non raggiungibile",
  "ctl.waiting_final": "Attendo la conferma finale dai dispositivi...",

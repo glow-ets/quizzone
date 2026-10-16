@@ -26,7 +26,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional, Set
 
 from . import protocol as P
-from .content import Question, Quiz
+from .content import DEFAULT_MAX_OPTIONS, Question, Quiz
 from .store import Store
 
 LOBBY, READY, OPEN, CLOSED, REVEAL, FINAL = "lobby", "ready", "open", "closed", "reveal", "final"
@@ -116,8 +116,12 @@ class Engine:
                  send: Optional[Callable[[str], None]] = None,
                  clock: Callable[[], float] = time.monotonic,
                  wall: Callable[[], float] = time.time,
-                 config: Optional[Config] = None):
+                 config: Optional[Config] = None,
+                 max_options: int = DEFAULT_MAX_OPTIONS):
         self.quiz = quiz
+        # Answer keys physically available on a team device. A start-up parameter, deliberately NOT part of
+        # Config (which is saved with the game and would override a new --options value after a restart).
+        self.max_options = max_options
         self.store = store or Store(None)
         self.send = send or (lambda line: None)
         self.clock = clock
@@ -535,7 +539,7 @@ class Engine:
                 raise CommandError("err.question_running")
             now = self.clock()
             seconds = max(3, min(30, int(seconds)))
-            answers = max(3, min(5, int(answers)))
+            answers = max(3, min(self.max_options, int(answers)))
             self.q = Question("__test__", 0, answers, seconds, 0, 0, 0)
             self.test = True
             self.test_report = None
@@ -910,6 +914,7 @@ class Engine:
                     self.devices.values(), key=lambda d: (d.slot is None, d.slot if d.slot is not None else 0, d.serial))]
                 snap["dismissed"] = [{"serial": f"{k:08X}", "slot": v.get("slot")} for k, v in sorted(self.dismissed.items())]
                 snap["config"] = self.cfg.to_dict()
+                snap["max_options"] = self.max_options
                 snap["unconfirmed"] = [s + 1 for s in self.unconfirmed]
                 snap["unsynced"] = sorted(d.slot + 1 for d in self.devices.values()
                                           if d.slot is not None and self._online(d, now) and d.reported_slot != d.slot)
