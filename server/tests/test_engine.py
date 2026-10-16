@@ -26,6 +26,16 @@ class Flow(unittest.TestCase):
         e.cmd_reveal()
         self.assertEqual(e.scores.get(2, 0), 0)
 
+    def test_ranks_are_dense_even_with_a_long_run_of_ties(self):
+        e = self.e
+        e.cmd_config(allow_negative=True)
+        e.scores = {0: 226, 1: 92, 2: 10, 3: -128}
+        e.enabled = [True] * len(e.enabled)
+        ranks = e._ranks([0, 1, 2, 3] + list(range(4, 12)))   # eight more teams on 0
+        self.assertEqual([ranks[s] for s in (0, 1, 2)], [1, 2, 3])
+        self.assertEqual({ranks[s] for s in range(4, 12)}, {4})
+        self.assertEqual(ranks[3], 5, "the next score is rank 5, not 12")
+
     def test_scoring_and_speed_bonus(self):
         e = self.e
         e.cmd_config(allow_negative=True)

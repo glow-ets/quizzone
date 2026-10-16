@@ -866,12 +866,14 @@ class Engine:
         return self.names[slot]
 
     def _ranks(self, slots: List[int]) -> Dict[int, int]:
+        """Dense ranking: equal scores share a rank and the next score gets the next number (1, 2, 2, 3 - never
+        1, 2, 2, 4), so a long run of ties (everyone on 0, say) cannot make the following rank jump."""
         order = sorted(slots, key=lambda s: -self.scores.get(s, 0))
         ranks, last, rank = {}, None, 0
-        for i, s in enumerate(order):
+        for s in order:
             sc = self.scores.get(s, 0)
             if sc != last:
-                rank, last = i + 1, sc
+                rank, last = rank + 1, sc
             ranks[s] = rank
         return ranks
 
