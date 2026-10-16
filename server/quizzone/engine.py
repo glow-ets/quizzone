@@ -56,7 +56,7 @@ class Config:
     online_s: float = 4.0
     close_when_all_answered: bool = True
     read_first: bool = False          # two-step: show question, then "go"
-    allow_negative: bool = True
+    allow_negative: bool = False
     no_answer_penalty: int = 0
     auto_assign: bool = False
     expected_group: int = 77

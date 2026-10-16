@@ -138,7 +138,7 @@ class UiSmoke(unittest.TestCase):
         ctl.click("h1")                                                   # leave the input: the panel repaints
         ctl.wait_for_function("document.querySelector('label.changed .def')")
         self.assertIn("300", ctl.inner_text("label.changed"))             # the default is shown next to it
-        ctl.locator("input[data-cfg=allow_negative]").uncheck()
+        ctl.locator("input[data-cfg=allow_negative]").check()
         ctl.wait_for_function("document.querySelectorAll('label.changed').length === 2")
         self.assertFalse(ctl.is_disabled("#reset-cfg"))
         color = lambda sel: ctl.evaluate(f"getComputedStyle(document.querySelector('{sel}')).color")

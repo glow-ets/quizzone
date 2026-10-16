@@ -19,8 +19,16 @@ class Flow(unittest.TestCase):
         self.e, self.clock, self.wall, self.sent = make_engine(4)
         bring_online(self.e, self.clock, 4)
 
+    def test_scores_cannot_go_negative_by_default(self):
+        e = self.e
+        self.assertFalse(e.cfg.allow_negative)
+        run_question(e, self.clock, {2: (1, 500)})          # wrong answer
+        e.cmd_reveal()
+        self.assertEqual(e.scores.get(2, 0), 0)
+
     def test_scoring_and_speed_bonus(self):
         e = self.e
+        e.cmd_config(allow_negative=True)
         run_question(e, self.clock, {0: (2, 0), 1: (2, 10000), 2: (1, 500)})
         self.assertEqual(e.phase, E.CLOSED)
         self.assertTrue(e.settled)
@@ -550,7 +558,7 @@ class ResetConfig(unittest.TestCase):
     def test_reset_restores_defaults_and_keeps_game_state(self):
         e, clock, wall, sent = make_engine(4)
         bring_online(e, clock, 4)
-        e.cmd_config(tolerance_ms=900, allow_negative=False, no_answer_penalty=20, auto_assign=True)
+        e.cmd_config(tolerance_ms=900, allow_negative=True, no_answer_penalty=20, auto_assign=True)
         e.cmd_adjust(slot=1, delta=70)
         e.cmd_rename(slot=0, name="Alfa")
         self.assertNotEqual(e.cfg.to_dict(), Config().to_dict())
