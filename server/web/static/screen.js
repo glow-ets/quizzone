@@ -26,6 +26,8 @@ function render() {
   $("ttl").textContent = S.title + (S.series ? " · " + S.series : "");
   $("prog").textContent = S.question && !S.question.test ? t("screen.progress", { n: S.cursor + 1, total: S.total }) : "";
   $("net").classList.toggle("hidden", S.link_ok && connected);
+  const nT = S.teams.length, lampRows = nT <= 8 ? 1 : 2;
+  $("lamps").style.setProperty("--cols", Math.max(1, Math.ceil(nT / lampRows)));      // 15 teams: 8 + 7, all boxes the same width
   $("lamps").innerHTML = S.phase === "final" ? "" : lampsHtml(S);
   const q = S.question, st = $("stage");
   $("root").classList.toggle("is-lobby", S.phase === "lobby" || (!q && S.phase !== "final"));

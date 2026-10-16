@@ -129,6 +129,22 @@ class UiSmoke(unittest.TestCase):
         ctl.wait_for_function("document.querySelector('#devices').innerText.includes('0000ABCD')")
         self.assertEqual([m for m in errs if "409" not in m], [])
 
+    def test_team_lamps_use_two_balanced_rows_of_equal_boxes(self):
+        self.e.cmd_reset_game(confirm=True)                   # earlier tests may have left the game on the final screen
+        scr, errs = self.page(1920, 1080, "/")
+        scr.wait_for_selector(".lamp")
+        boxes = scr.evaluate("[...document.querySelectorAll('.lamp')].map(e => { const r = e.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width)]; })")
+        self.assertEqual(len(boxes), 15)
+        widths = {b[2] for b in boxes}
+        self.assertLessEqual(max(widths) - min(widths), 1, f"all boxes the same width: {widths}")
+        rows = {}
+        for _, top, _ in boxes:
+            rows[top] = rows.get(top, 0) + 1
+        self.assertEqual(sorted(rows.values(), reverse=True), [8, 7], "balanced rows (8 + 7), not 12 + 3")
+        self.assertGreater(min(widths), 150, "boxes use the width instead of staying small")
+        self.assertEqual(self.overflow(scr), [0, 0])
+        self.assertEqual(errs, [])
+
     def test_reset_settings_button_and_highlight_of_changed_values(self):
         ctl, errs = self.page(1280, 900, "/control")
         ctl.wait_for_selector("input[data-cfgnum=tolerance_ms]")
