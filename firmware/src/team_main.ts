@@ -72,6 +72,10 @@ radio.setFrequencyBand(QZ_BAND);
 radio.setTransmitPower(QZ_TX_POWER);
 radio.setTransmitSerialNumber(true);
 music.setVolume(QZ_VOLUME);
+// The audio engine drives the edge-connector audio pin (P0 by default) continuously once it has started,
+// and the edu:bit's P0 current indicator then blinks forever. Keep that pin released and connect it only
+// while a sound is playing (the on-board speaker of the V2 is not affected).
+pins.setAudioPinEnabled(false);
 for (let i = 0; i < QZ_KEY_SOURCES.length; i++) {
     if (QZ_KEY_SOURCES[i] < 1000) pins.setPull(QZ_KEY_SOURCES[i], PinPullMode.PullUp);
 }
@@ -107,7 +111,10 @@ control.inBackground(function () {
 });
 control.inBackground(function () {
     while (true) {
-        if (qzSoundQueue.length > 0) qzPlay(qzSoundQueue.shift());
-        else basic.pause(10);
+        if (qzSoundQueue.length > 0) {
+            pins.setAudioPinEnabled(true);
+            while (qzSoundQueue.length > 0) qzPlay(qzSoundQueue.shift());
+            pins.setAudioPinEnabled(false);
+        } else basic.pause(10);
     }
 });

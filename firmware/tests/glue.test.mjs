@@ -14,7 +14,7 @@ function makeDevice() {
   let now = 1000;
   const sleepers = [];
   const flush = async () => { for (let i = 0; i < 30; i++) await Promise.resolve(); };
-  const sent = [], leds = Array.from({ length: 5 }, () => Array(5).fill(false)), tones = [];
+  const audioPin = [], sent = [], leds = Array.from({ length: 5 }, () => Array(5).fill(false)), tones = [];
   const input = { A: false, B: false };
   const g = {
     console,
@@ -29,8 +29,8 @@ function makeDevice() {
     basic: { pause: (ms) => new Promise((r) => sleepers.push({ t: now + ms, r })), clearScreen: () => leds.forEach((r) => r.fill(false)) },
     radio: { setGroup() {}, setFrequencyBand() {}, setTransmitPower() {}, setTransmitSerialNumber() {},
       sendBuffer: (b) => sent.push([...b]), onReceivedBuffer: () => {} },
-    music: { setVolume() {}, playTone: (f, d) => { tones.push(f); } },
-    pins: { setPull() {}, digitalReadPin: () => 1 },
+    music: { setVolume() {}, playTone: (f, d) => { tones.push(f); return g.basic.pause(d); } },
+    pins: { setPull() {}, digitalReadPin: () => 1, setAudioPinEnabled: (e) => { audioPin.push([now, e]); } },
     input: { buttonIsPressed: (b) => input[b] },
     led: { plot: (x, y) => { leds[y][x] = true; }, unplot: (x, y) => { leds[y][x] = false; } },
     serial: {},
@@ -42,6 +42,7 @@ function makeDevice() {
     if (f === 'team_main.ts') {
       code = code.replace(/basic\.pause\(/g, 'await basic.pause(')
         .replace(/control\.inBackground\(function \(\) \{/g, 'control.inBackground(async function () {')
+        .replace(/music\.playTone\(/g, 'await music.playTone(')
         .replace('function qzPlay(', 'async function qzPlay(')
         .replace(/qzPlay\(qzSoundQueue\.shift\(\)\)/, 'await qzPlay(qzSoundQueue.shift())');
     }
@@ -49,7 +50,7 @@ function makeDevice() {
   }
   g.__fibers.forEach((fn) => fn());           // start the fibers (they run until their first pause)
   const dev = {
-    ctx, sent, tones, input,
+    ctx, sent, tones, input, audioPin,
     get now() { return now; },
     screen: () => leds.map((r) => r.map((v) => (v ? '#' : '.')).join('')),
     async run(ms, sample) {
@@ -152,4 +153,17 @@ test('glue: closed -> result -> idle -> next question: the screen follows each p
   await beacons(dev, 600, () => ({ phase: 1, q: 6 }));
   const lit = dev.screen().join('').split('#').length - 1;
   assert.ok(lit > 15, `new question: countdown bar, ${lit} LEDs lit`);
+});
+
+test('glue: the edge-connector audio pin (P0) is released except while a sound plays', async () => {
+  const dev = makeDevice();
+  assert.deepEqual(dev.audioPin.map((e) => e[1]), [false], 'released at start-up, before any sound');
+  await join(dev, 0);                                   // assignment plays a chirp
+  await dev.run(1000);
+  const states = dev.audioPin.map((e) => e[1]);
+  assert.ok(dev.tones.length > 0, 'a sound did play');
+  assert.deepEqual(states, [false, true, false], 'connected only around the sound');
+  assert.equal(states[states.length - 1], false, 'released again once the queue is empty');
+  await dev.run(5000);                                  // idle: nothing may re-enable it
+  assert.equal(dev.audioPin.length, 3);
 });

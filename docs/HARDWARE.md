@@ -100,3 +100,11 @@ What the team sees and hears:
 | result | tick (correct), cross (wrong), dash (no answer) | happy / sad jingle |
 | no link to the base for 2.5 s | "no link" icon, presses ignored | - |
 | identify (from the control panel) | full-screen flashes, then the team number | three beeps |
+
+## P0 current indicator blinking on the edu:bit
+
+Once the micro:bit audio engine has started, it drives the audio pin (P0 by default) continuously, so the
+edu:bit's P0 current indicator blinks even when nothing is playing. The team firmware therefore keeps the
+audio pin released (`pins.setAudioPinEnabled(false)`) and connects it only while a sound is playing. If the
+indicator still blinks on your hardware, report it: the next options are moving the speaker to another pin
+(`pins.setAudioPin`) or `music.setSilenceLevel`.
