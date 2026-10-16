@@ -1,5 +1,6 @@
 const $ = id => document.getElementById(id);
 let S = null, rendered = {}, toastTimer = null;
+document.getElementById("qlink").href = "/questions" + (TOKEN ? `?token=${encodeURIComponent(TOKEN)}` : "");
 document.getElementById("csv").href = "/api/export.csv" + (TOKEN ? `?token=${encodeURIComponent(TOKEN)}` : "");
 
 function toast(msg) {

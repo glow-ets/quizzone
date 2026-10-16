@@ -130,5 +130,16 @@
  "log.device_restored": "Dispositivo {serial} ripristinato come squadra {team}",
  "log.device_added_to": "Dispositivo {serial} aggiunto come squadra {team}",
  "err.device_exists": "Il dispositivo è già nell'elenco.",
- "err.slot_taken": "Quella squadra ha già un dispositivo."
+ "err.slot_taken": "Quella squadra ha già un dispositivo.",
+ "q.title": "Domande e risposte",
+ "q.show": "Mostra",
+ "q.hide": "Nascondi",
+ "q.back": "Torna al controllo",
+ "q.hidden": "Contenuto nascosto. Le domande e le risposte corrette non vengono nemmeno caricate finché non premi Mostra.",
+ "q.warning": "Solo lettura. Controlla che lo schermo grande non sia in mirroring prima di mostrare.",
+ "q.autohide": "Solo lettura. Si nasconde da solo dopo {s} s senza attività (Esc nasconde subito).",
+ "q.correct": "Risposta corretta",
+ "q.meta": "{s} s · {p} punti · penalità {n}",
+ "q.too_many": "Più di {n} risposte: non entra nei tasti",
+ "ctl.questions": "Domande"
 }

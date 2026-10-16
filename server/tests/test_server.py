@@ -22,6 +22,8 @@ class Base(unittest.TestCase):
         os.makedirs(os.path.join(self.web.name, "static")); os.makedirs(os.path.join(self.web.name, "i18n"))
         with open(os.path.join(self.web.name, "static", "screen.html"), "w") as f:
             f.write("<html>screen</html>")
+        with open(os.path.join(self.web.name, "static", "questions.html"), "w") as f:
+            f.write("<html>questions page</html>")
         with open(os.path.join(self.web.name, "i18n", "it.json"), "w") as f:
             f.write('{"a":"b"}')
         with open(os.path.join(self.web.name, "secret.txt"), "w") as f:
@@ -143,8 +145,44 @@ class Http(Base):
         self.assertEqual(self.req("GET", "/api/state")[0], 200)
 
 
+class Questions(Base):
+    def test_questions_page_and_api(self):
+        self.assertEqual(self.req("GET", "/questions")[0], 200)
+        st, _, d = self.req("GET", "/api/questions?lang=it")
+        self.assertEqual(st, 200)
+        j = json.loads(d)
+        self.assertEqual(j["max_options"], 4)
+        self.assertEqual(len(j["questions"]), len(self.engine.quiz.questions))
+        q0 = j["questions"][0]
+        self.assertEqual(q0["answers"], self.engine.quiz.localized(self.engine.quiz.questions[0], "it")["answers"])
+        self.assertEqual(q0["correct"], self.engine.quiz.questions[0].correct)
+        en = json.loads(self.req("GET", "/api/questions?lang=en")[2])
+        self.assertEqual(en["lang"], "en")
+        self.assertNotEqual(en["questions"][0]["text"], q0["text"])
+        self.assertEqual(json.loads(self.req("GET", "/api/questions?lang=../../etc")[2])["lang"], self.engine.lang)
+
+    def test_answers_never_travel_in_snapshots(self):
+        correct_text = {q["answers"][q["correct"]] for q in self.engine.questions_view("it")["questions"]}
+        self.cmd("next"); 
+        for role in ("screen", "control"):
+            body = self.req("GET", f"/api/state?role={role}")[2].decode()
+            self.assertNotIn('"correct"', body)       # open question: no hint
+            self.assertNotIn("questions", json.loads(body))
+        self.assertTrue(correct_text)
+
+    def test_questions_page_is_read_only(self):
+        self.assertEqual(self.req("POST", "/api/questions", b"{}")[0], 404)
+
+
 class Auth(Base):
     token = "s3cret"
+
+    def test_questions_api_requires_token(self):
+        self.assertEqual(self.req("GET", "/api/questions")[0], 401)
+        self.assertEqual(self.req("GET", "/api/questions", headers={"X-Token": "wrong"})[0], 401)
+        self.assertEqual(self.req("GET", "/api/questions?token=s3cret")[0], 200)
+        self.assertEqual(self.req("GET", "/api/questions", headers={"X-Token": "s3cret"})[0], 200)
+        self.assertNotIn(b"answers", self.req("GET", "/questions")[2])      # the page itself carries no content
 
     def test_control_requires_token_screen_does_not(self):
         self.assertEqual(self.req("GET", "/api/state")[0], 200)

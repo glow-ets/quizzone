@@ -29,6 +29,11 @@ Poi apri nel browser del PC:
 Per comandare da un telefono: `run --host 0.0.0.0 --token LAPAROLA`, poi apri `http://IP-DEL-PC:8080/control?token=LAPAROLA`.
 Senza `--token` chiunque nella rete puo' comandare il quiz.
 
+* `http://localhost:8080/questions` (o il pulsante *Domande* nel pannello): elenco di sola lettura di tutte le domande con la
+  risposta corretta. All'apertura e' nascosto e il contenuto non viene nemmeno scaricato finche' non premi *Mostra*;
+  *Nascondi*, `Esc`, il cambio di scheda o 60 s senza attivita' lo nascondono di nuovo e lo cancellano dalla pagina.
+  Con `--token` serve anche qui. Mostra anche il numero di opzioni supportate.
+
 Svolgimento: *Prossima domanda* -> le squadre rispondono (si chiude da solo quando tutte hanno risposto, o allo
 scadere) -> *Mostra la risposta* -> *Prossima domanda*. Alla fine *Vai alla classifica*. *Scarica risultati* produce un CSV.
 Risposte per domanda: i dispositivi hanno 4 tasti, quindi il server accetta al massimo 4 risposte per domanda

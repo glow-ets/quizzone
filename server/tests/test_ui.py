@@ -127,6 +127,39 @@ class UiSmoke(unittest.TestCase):
         ctl.wait_for_function("document.querySelector('#devices').innerText.includes('0000ABCD')")
         self.assertEqual([m for m in errs if "409" not in m], [])
 
+    def test_questions_page_is_hidden_until_shown_and_hides_again(self):
+        first = self.e.quiz.localized(self.e.quiz.questions[0], "it")["text"]
+        pg, errs = self.page(1280, 900, "/questions?autohide=4")
+        pg.wait_for_selector("#toggle")
+        calls = []
+        pg.on("request", lambda r: calls.append(r.url) if "/api/questions" in r.url else None)
+        self.assertNotIn(first, pg.content())                               # hidden: not in the DOM
+        self.assertEqual(calls, [], "nothing is even fetched while hidden")
+        pg.click("#toggle")
+        pg.wait_for_selector(".qcard")
+        self.assertEqual(pg.locator(".qcard").count(), len(self.e.quiz.questions))
+        self.assertEqual(pg.locator(".qans li.right").count(), len(self.e.quiz.questions))
+        self.assertIn("4", pg.inner_text("#p-opts"))                         # supported options shown
+        self.assertEqual(self.overflow(pg)[0], 0)
+        pg.click("#toggle")                                                  # manual hide
+        self.assertEqual(pg.locator(".qcard").count(), 0)
+        self.assertNotIn(first, pg.content())
+        pg.click("#toggle"); pg.wait_for_selector(".qcard")
+        pg.keyboard.press("Escape")                                          # Esc hides at once
+        self.assertEqual(pg.locator(".qcard").count(), 0)
+        pg.click("#toggle"); pg.wait_for_selector(".qcard")                  # auto-hide after inactivity
+        pg.wait_for_function("document.querySelectorAll('.qcard').length === 0", timeout=9000)
+        self.assertNotIn(first, pg.content())
+        self.assertEqual(errs, [])
+
+    def test_questions_page_activity_postpones_auto_hide(self):
+        pg, errs = self.page(1280, 900, "/questions?autohide=4")
+        pg.wait_for_selector("#toggle"); pg.click("#toggle"); pg.wait_for_selector(".qcard")
+        for _ in range(8):                                                   # 6 s of activity > 4 s limit
+            time.sleep(0.75); pg.mouse.move(100 + _ * 10, 200)
+        self.assertGreater(pg.locator(".qcard").count(), 0)
+        self.assertEqual(errs, [])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -130,5 +130,16 @@
  "log.device_restored": "Device {serial} restored as team {team}",
  "log.device_added_to": "Device {serial} added as team {team}",
  "err.device_exists": "The device is already in the list.",
- "err.slot_taken": "That team already has a device."
+ "err.slot_taken": "That team already has a device.",
+ "q.title": "Questions and answers",
+ "q.show": "Show",
+ "q.hide": "Hide",
+ "q.back": "Back to control",
+ "q.hidden": "Content hidden. Questions and correct answers are not even loaded until you press Show.",
+ "q.warning": "Read-only. Make sure the big screen is not mirroring this window before showing.",
+ "q.autohide": "Read-only. Hides itself after {s} s without activity (Esc hides at once).",
+ "q.correct": "Correct answer",
+ "q.meta": "{s} s · {p} points · penalty {n}",
+ "q.too_many": "More than {n} answers: does not fit the keys",
+ "ctl.questions": "Questions"
 }

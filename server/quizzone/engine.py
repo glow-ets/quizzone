@@ -931,6 +931,20 @@ class Engine:
                 snap["state_error"] = self.store.last_error
             return snap
 
+    def questions_view(self, lang: Optional[str] = None) -> dict:
+        """Every question with its answers and the correct one, for the read-only control page.
+        Never part of a snapshot: it is served only by the token-protected /api/questions."""
+        lang = lang if lang in self.quiz.languages else self.lang
+        items = []
+        for i, q in enumerate(self.quiz.questions):
+            loc = self.quiz.localized(q, lang)
+            items.append({"index": i, "id": q.id, "category": loc["category"], "text": loc["text"],
+                          "answers": loc["answers"], "correct": q.correct, "explanation": loc["explanation"],
+                          "time_s": q.time_s, "points": q.points, "penalty": q.penalty,
+                          "speed_bonus": q.speed_bonus, "too_many_options": q.n_answers > self.max_options})
+        return {"lang": lang, "languages": self.quiz.languages, "title": self.quiz.localized_title(lang),
+                "max_options": self.max_options, "cursor": self.cursor, "questions": items}
+
     def _device_view(self, d: Device, now: float) -> dict:
         return {"serial": f"{d.serial:08X}", "slot": d.slot, "online": self._online(d, now),
                 "seen_ago": round(now - d.last_seen, 1) if d.last_seen > -1e8 else None,

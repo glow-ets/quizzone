@@ -2,6 +2,8 @@
 
   GET  /                     big screen
   GET  /control              operator panel
+  GET  /questions            read-only list of all questions and answers (page; the data comes from /api/questions)
+  GET  /api/questions?lang=  all questions + correct answers (control only, never in a snapshot)
   GET  /api/state?role=      one snapshot (JSON)
   GET  /api/events?role=     SSE stream of snapshots (also re-sent every second as keep-alive)
   POST /api/cmd              {"name": ..., "args": {...}}   (control only)
@@ -178,6 +180,13 @@ class Handler(BaseHTTPRequestHandler):
                 return self._static("static/screen.html")
             if p == "/control":
                 return self._static("static/control.html")
+            if p == "/questions":
+                return self._static("static/questions.html")
+            if p == "/api/questions":
+                if not self.app.authorized(self, q):
+                    return self._json({"error": "unauthorized"}, 401)
+                lang = (q.get("lang") or [""])[0]
+                return self._json(self.app.engine.questions_view(lang))
             if p.startswith("/static/"):
                 return self._static(p[1:])
             if p.startswith("/i18n/") and p.endswith(".json"):

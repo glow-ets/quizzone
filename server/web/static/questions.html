@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Quiz - domande</title>
+<link rel="stylesheet" href="/static/theme.css">
+</head>
+<body>
+<div class="ctl qpage">
+  <header>
+    <h1 id="h-title" data-i="q.title"></h1>
+    <div class="row">
+      <span class="pill" id="p-opts"></span>
+      <label class="muted" for="lang" data-i="ctl.language"></label>
+      <select id="lang" disabled></select>
+      <a class="btn" id="back" data-i="q.back"></a>
+      <button class="btn primary" id="toggle" data-i="q.show"></button>
+    </div>
+  </header>
+  <p class="muted" id="note"></p>
+  <section class="panel hide-note" id="veil" aria-live="polite">
+    <p data-i="q.hidden"></p>
+  </section>
+  <section id="list" class="qlist hidden" aria-label="Domande"></section>
+</div>
+<script src="/static/common.js"></script>
+<script src="/static/questions.js"></script>
+</body>
+</html>
