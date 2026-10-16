@@ -12,10 +12,11 @@ const QZ_VOLUME = 200;          // 0..255
 
 // ---- hardware access --------------------------------------------------------
 let qzSoundQueue: number[] = [];
+// Current display state, written by the HAL and read by the display fiber (cooperative fibers: no tearing).
 let qzDMode = QZ_D_UNASSIGNED;
 let qzDA = 0;
 let qzDB = 0;
-let qzDDirty = true;
+let qzDSince = 0;               // control.millis() when the state last changed (drives blinking and flashes)
 
 class TeamHal implements QzTeamHal {
     radioSend(bytes: number[]): void {
@@ -27,7 +28,9 @@ class TeamHal implements QzTeamHal {
         if (qzSoundQueue.length < 6) qzSoundQueue.push(id);
     }
     display(mode: number, a: number, b: number): void {
-        qzDMode = mode; qzDA = a; qzDB = b; qzDDirty = true;
+        if (mode != qzDMode || a != qzDA || b != qzDB) {
+            qzDMode = mode; qzDA = a; qzDB = b; qzDSince = control.millis();
+        }
     }
 }
 
@@ -43,32 +46,6 @@ function qzReadKey(src: number): boolean {
     return pins.digitalReadPin(src) == 0;      // active low, pull-up enabled
 }
 
-// ---- LED bitmaps (5x5, '#' = lit) ------------------------------------------
-const QZ_LETTERS: string[][] = [
-    [".###.", "#...#", "#####", "#...#", "#...#"],   // A
-    ["####.", "#...#", "####.", "#...#", "####."],   // B
-    [".####", "#....", "#....", "#....", ".####"],   // C
-    ["####.", "#...#", "#...#", "#...#", "####."],   // D
-    ["#####", "#....", "####.", "#....", "#####"]    // E
-];
-const QZ_DIGITS: string[][] = [
-    ["###", "#.#", "#.#", "#.#", "###"],
-    [".#.", "##.", ".#.", ".#.", "###"],
-    ["###", "..#", "###", "#..", "###"],
-    ["###", "..#", "###", "..#", "###"],
-    ["#.#", "#.#", "###", "..#", "..#"],
-    ["###", "#..", "###", "..#", "###"],
-    ["###", "#..", "###", "#.#", "###"],
-    ["###", "..#", "..#", "..#", "..#"],
-    ["###", "#.#", "###", "#.#", "###"],
-    ["###", "#.#", "###", "..#", "###"]
-];
-const QZ_ICON_CHECK = [".....", "....#", "...#.", "#.#..", ".#..."];
-const QZ_ICON_CROSS = ["#...#", ".#.#.", "..#..", ".#.#.", "#...#"];
-const QZ_ICON_DASH = [".....", ".....", ".###.", ".....", "....."];
-const QZ_ICON_QUESTION = [".###.", "#...#", "..##.", ".....", "..#.."];
-const QZ_ICON_NOLINK = ["#...#", ".....", "..#..", ".....", "#...#"];
-
 function qzDraw(rows: string[]) {
     for (let y = 0; y < 5; y++) {
         for (let x = 0; x < 5; x++) {
@@ -77,59 +54,7 @@ function qzDraw(rows: string[]) {
     }
 }
 
-function qzDrawNumber(n: number) {
-    // 1..9: one 3x5 digit centred. 10..99: a bar for the tens "1" plus a 3x5 unit digit.
-    const rows: string[] = [];
-    const u = QZ_DIGITS[n % 10];
-    for (let y = 0; y < 5; y++) {
-        if (n < 10) rows.push("." + u[y] + ".");
-        else rows.push("#." + u[y]);
-    }
-    qzDraw(rows);
-}
-
-function qzDrawBar(lit: number) {
-    for (let i = 0; i < 25; i++) {
-        if (i < lit) led.plot(i % 5, Math.idiv(i, 5)); else led.unplot(i % 5, Math.idiv(i, 5));
-    }
-}
-
-function qzRender() {
-    const mode = qzDMode;
-    const a = qzDA;
-    const b = qzDB;
-    qzDDirty = false;
-    if (mode == QZ_D_UNASSIGNED) qzDraw(QZ_ICON_QUESTION);
-    else if (mode == QZ_D_IDLE) qzDrawNumber(a);
-    else if (mode == QZ_D_WAIT) qzDrawBar(a);
-    else if (mode == QZ_D_LOCKED || mode == QZ_D_CLOSED) {
-        if (a >= 1 && a <= 5) {
-            if (mode == QZ_D_LOCKED && b == 0) {
-                // not yet acknowledged by the base: blink so the team knows
-                for (let i = 0; i < 4 && !qzDDirty; i++) {
-                    qzDraw(QZ_LETTERS[a - 1]); basic.pause(250);
-                    qzDraw([]); basic.pause(100);
-                }
-                if (!qzDDirty) qzDDirty = true;   // keep blinking until state changes
-                qzDMode = mode; qzDA = a; qzDB = b;
-            } else {
-                qzDraw(QZ_LETTERS[a - 1]);
-            }
-        } else qzDraw(QZ_ICON_DASH);
-    } else if (mode == QZ_D_RESULT) {
-        if (a == 1) qzDraw(QZ_ICON_CHECK);
-        else if (a == 2) qzDraw(QZ_ICON_CROSS);
-        else qzDraw(QZ_ICON_DASH);
-    } else if (mode == QZ_D_NOLINK) qzDraw(QZ_ICON_NOLINK);
-    else if (mode == QZ_D_IDENT) {
-        for (let i = 0; i < 3 && !qzDDirty; i++) {
-            basic.clearScreen(); basic.pause(120);
-            for (let y = 0; y < 5; y++) for (let x = 0; x < 5; x++) led.plot(x, y);
-            basic.pause(120);
-        }
-        if (a > 0 && !qzDDirty) qzDrawNumber(a);
-    }
-}
+let qzLastFrame = "";
 
 function qzPlay(id: number) {
     if (id == QZ_S_LOCK) { music.playTone(880, 60); }
@@ -173,7 +98,10 @@ control.inBackground(function () {
 // Display and sound run in their own fibers so they can block without delaying key scanning.
 control.inBackground(function () {
     while (true) {
-        if (qzDDirty) qzRender();
+        // Never blocks and never keeps a copy of the state: draw whatever the CURRENT state looks like now.
+        const frame = qzFrame(qzDMode, qzDA, qzDB, control.millis() - qzDSince);
+        const key = frame.join("");
+        if (key != qzLastFrame) { qzLastFrame = key; qzDraw(frame); }
         basic.pause(20);
     }
 });

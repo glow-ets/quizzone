@@ -6,7 +6,7 @@
   "type": "module",
   "engines": { "node": ">=22.13" },
   "scripts": {
-    "test": "node --no-warnings --test tests/firmware.test.mjs",
+    "test": "node --no-warnings --test \"tests/*.test.mjs\"",
     "typecheck": "node tools/typecheck.mjs",
     "build": "node tools/build.mjs",
     "check": "npm run test && npm run typecheck && npm run build"

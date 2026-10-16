@@ -572,3 +572,98 @@ class RestartSafety(unittest.TestCase):
             e2.handle_line(t_line(0x100, 0, qs, 2, 100, phase_seen=1))     # only team 1 heard so far
             c2.adv(0.1); e2.tick()
             self.assertEqual(e2.phase, E.OPEN, "must keep waiting for the other three devices")
+
+
+class ReAddDevices(unittest.TestCase):
+    def forgotten(self, path=None):
+        e, clock, wall, sent = make_engine(4, path)
+        e.handle_line(t_line(0xAB, 255, 0)); e.cmd_assign(serial="AB", slot=1)
+        e.handle_line(t_line(0xAB, 1, 0))
+        clock.adv(10)
+        e.cmd_forget_device(serial="AB")
+        return e, clock, wall, sent
+
+    def test_forgotten_device_is_listed_and_can_be_restored_with_its_team(self):
+        e, clock, *_ = self.forgotten()
+        self.assertEqual(e.devices, {})
+        self.assertEqual(e.snapshot("control")["dismissed"], [{"serial": "000000AB", "slot": 1}])
+        e.cmd_restore_device(serial="000000AB")
+        self.assertEqual(e.slot_owner, {1: 0xAB})
+        self.assertEqual(e.snapshot("control")["dismissed"], [])
+        view = e.snapshot("control")["devices"][0]
+        self.assertEqual((view["serial"], view["slot"], view["online"]), ("000000AB", 1, False))
+        e.handle_line(t_line(0xAB, 1, 0))                       # device talks again: simply online
+        self.assertTrue(e.snapshot("control")["devices"][0]["online"])
+
+    def test_restore_when_team_was_taken_meanwhile_gives_an_unassigned_device(self):
+        e, clock, *_ = self.forgotten()
+        e.handle_line(t_line(0xCD, 255, 0)); e.cmd_assign(serial="CD", slot=1)
+        e.cmd_restore_device(serial="AB")
+        self.assertIsNone(e.devices[0xAB].slot)
+        self.assertEqual(e.slot_owner, {1: 0xCD})
+
+    def test_forgotten_device_that_talks_again_reappears_and_is_no_longer_listed_as_forgotten(self):
+        e, clock, *_ = self.forgotten()
+        e.handle_line(t_line(0xAB, 255, 0))
+        self.assertIn(0xAB, e.devices)
+        self.assertEqual(e.snapshot("control")["dismissed"], [])
+
+    def test_restore_errors(self):
+        e, *_ = self.forgotten()
+        with self.assertRaises(CommandError) as c:
+            e.cmd_restore_device(serial="FF")
+        self.assertEqual(c.exception.key, "err.unknown_device")
+        with self.assertRaises(CommandError):
+            e.cmd_restore_device(serial="zz")
+        e.cmd_restore_device(serial="AB")
+        with self.assertRaises(CommandError) as c:
+            e.cmd_restore_device(serial="AB")
+        self.assertEqual(c.exception.key, "err.device_exists")
+
+    def test_add_device_by_serial(self):
+        e, clock, _, sent = make_engine(4)
+        e.cmd_add_device(serial="1a2b3c4d", slot=2)
+        self.assertEqual(e.slot_owner, {2: 0x1A2B3C4D})
+        view = e.snapshot("control")["devices"][0]
+        self.assertFalse(view["online"])
+        # when it shows up it is recognised and told its team if it does not know it yet
+        e.handle_line(t_line(0x1A2B3C4D, 255, 0))
+        self.assertEqual(P.strip_line(sent[-1]), "A 1A2B3C4D 2")
+        self.assertFalse(e.snapshot("control")["devices"][0]["synced"])
+        e.handle_line(t_line(0x1A2B3C4D, 2, 0))
+        self.assertTrue(e.snapshot("control")["devices"][0]["synced"])
+
+    def test_add_device_without_team_and_validation(self):
+        e, *_ = make_engine(4)
+        e.cmd_add_device(serial="  ab  ")
+        self.assertIsNone(e.devices[0xAB].slot)
+        for bad in ({"serial": ""}, {"serial": "xyz"}, {"serial": "123456789"}, {"serial": "CD", "slot": 9},
+                    {"serial": "CD", "slot": -1}, {"serial": "CD", "slot": "1"}, {"serial": "CD", "slot": True}):
+            with self.assertRaises(CommandError, msg=str(bad)):
+                e.cmd_add_device(**bad)
+        e.cmd_add_device(serial="CD", slot=0)
+        with self.assertRaises(CommandError) as c:
+            e.cmd_add_device(serial="AB")
+        self.assertEqual(c.exception.key, "err.device_exists")
+        with self.assertRaises(CommandError) as c:
+            e.cmd_add_device(serial="EF", slot=0)
+        self.assertEqual(c.exception.key, "err.slot_taken")
+
+    def test_forgotten_list_and_added_devices_survive_a_restart(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "s.json")
+            e, *_ = self.forgotten(path)
+            e.cmd_add_device(serial="77", slot=3)
+            e2, *_ = make_engine(4, path)
+            self.assertEqual(e2.snapshot("control")["dismissed"], [{"serial": "000000AB", "slot": 1}])
+            self.assertEqual(e2.slot_owner, {3: 0x77})
+            e2.cmd_restore_device(serial="AB")
+            self.assertEqual(e2.slot_owner[1], 0xAB)
+
+    def test_restored_offline_device_does_not_block_early_close_or_settling(self):
+        e, clock, *_ = make_engine(3)
+        bring_online(e, clock, 2)
+        e.cmd_add_device(serial="999", slot=2)                  # registered, never heard
+        run_question(e, clock, {0: (2, 100), 1: (2, 100)}, n=2)
+        self.assertEqual(e.phase, E.CLOSED)
+        self.assertTrue(e.settled)

@@ -11,6 +11,7 @@
         "qz_config.ts",
         "qz_protocol.ts",
         "qz_team.ts",
+        "qz_display.ts",
         "main.ts"
     ],
     "supportedTargets": [

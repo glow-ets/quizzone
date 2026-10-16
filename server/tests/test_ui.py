@@ -113,6 +113,20 @@ class UiSmoke(unittest.TestCase):
         for errs in (e1, e2, e3):        # a refused command (409) is normal operator feedback, not a bug
             self.assertEqual([m for m in errs if "409" not in m], [])
 
+    def test_add_device_form_and_forgotten_list(self):
+        ctl, errs = self.page(1280, 900, "/control")
+        ctl.wait_for_selector("#add-btn")
+        ctl.fill("#add-serial", "ABCD")
+        ctl.click("#add-btn")
+        ctl.wait_for_function("document.querySelector('#devices').innerText.includes('0000ABCD')")
+        # an offline device can be forgotten, shows up in the forgotten list and can be restored
+        ctl.once("dialog", lambda d: d.accept())
+        ctl.click("button[data-forget='0000ABCD']")
+        ctl.wait_for_selector("button[data-restore='0000ABCD']")
+        ctl.click("button[data-restore='0000ABCD']")
+        ctl.wait_for_function("document.querySelector('#devices').innerText.includes('0000ABCD')")
+        self.assertEqual([m for m in errs if "409" not in m], [])
+
 
 if __name__ == "__main__":
     unittest.main()

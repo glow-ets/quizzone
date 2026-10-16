@@ -84,7 +84,8 @@ node firmware/tools/build.mjs      # writes firmware/dist/{team,base,probe}.ts a
 1. Start the server, power on all team devices.
 2. Control panel -> *Assegna le squadre ai nuovi dispositivi*, or switch on *auto assign* in the settings.
 3. Use *Fai lampeggiare* to see which physical device is which team; reassign from the drop-down if needed.
-4. The warning sign next to a device means it has not yet confirmed its team number: wait a few seconds.
+4. *Dimentica* (forget) removes a device from its team. The control panel keeps a list of forgotten devices with a *Ripristina* (restore) button that gives the device its old team back. A forgotten device that transmits again is listed as new automatically. A device can also be added by hand with its serial (8 hex digits, shown on the device list and in the log) in *Aggiungi un dispositivo*, optionally with a team number.
+5. The warning sign next to a device means it has not yet confirmed its team number: wait a few seconds.
 
 What the team sees and hears:
 

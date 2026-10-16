@@ -596,51 +596,14 @@ class QzTeam {
     }
 }
 
-// ===== team_main.ts =====
+// ===== qz_display.ts =====
 // =============================================================================
-//  TEAM DEVICE - MakeCode glue (micro:bit on an edu:bit, answer keys on pins).
-//  All game logic lives in qz_team.ts; this file only talks to the hardware.
+//  DISPLAY FRAMES - pure functions (no hardware, no blocking, no shared state).
+//  qzFrame() maps (display mode, a, b, ms since that state began) to the 5x5 picture that
+//  must be on the LEDs at that moment. The hardware glue (team_main.ts) only draws the
+//  result, so what the team sees is always a function of the CURRENT state: a late or
+//  repeated state change can never leave a stale picture behind.
 // =============================================================================
-
-// ---- EDIT ME: which input drives each answer (A, B, C, D, E) ---------------
-
-const QZ_BTN_A = 1000;
-const QZ_BTN_B = 1001;
-const QZ_KEY_SOURCES: number[] = [QZ_BTN_A, QZ_BTN_B, DigitalPin.P8, DigitalPin.P12]; 
-const QZ_VOLUME = 200;          // 0..255
-
-// ---- hardware access --------------------------------------------------------
-let qzSoundQueue: number[] = [];
-let qzDMode = QZ_D_UNASSIGNED;
-let qzDA = 0;
-let qzDB = 0;
-let qzDDirty = true;
-
-class TeamHal implements QzTeamHal {
-    radioSend(bytes: number[]): void {
-        const b = control.createBuffer(bytes.length);
-        for (let i = 0; i < bytes.length; i++) b[i] = bytes[i];
-        radio.sendBuffer(b);
-    }
-    sound(id: number): void {
-        if (qzSoundQueue.length < 6) qzSoundQueue.push(id);
-    }
-    display(mode: number, a: number, b: number): void {
-        qzDMode = mode; qzDA = a; qzDB = b; qzDDirty = true;
-    }
-}
-
-function qzBufToArray(b: Buffer): number[] {
-    const out: number[] = [];
-    for (let i = 0; i < b.length; i++) out.push(b[i]);
-    return out;
-}
-
-function qzReadKey(src: number): boolean {
-    if (src == QZ_BTN_A) return input.buttonIsPressed(Button.A);
-    if (src == QZ_BTN_B) return input.buttonIsPressed(Button.B);
-    return pins.digitalReadPin(src) == 0;      // active low, pull-up enabled
-}
 
 // ---- LED bitmaps (5x5, '#' = lit) ------------------------------------------
 const QZ_LETTERS: string[][] = [
@@ -668,6 +631,103 @@ const QZ_ICON_DASH = [".....", ".....", ".###.", ".....", "....."];
 const QZ_ICON_QUESTION = [".###.", "#...#", "..##.", ".....", "..#.."];
 const QZ_ICON_NOLINK = ["#...#", ".....", "..#..", ".....", "#...#"];
 
+const QZ_BLINK_PERIOD_MS = 350;      // locked but not yet confirmed by the base: letter blinks
+const QZ_BLINK_ON_MS = 250;
+const QZ_IDENT_STEP_MS = 120;        // identify: 3 flashes of 2 steps (dark, full), then the team number
+const QZ_IDENT_STEPS = 6;
+
+const QZ_BLANK = [".....", ".....", ".....", ".....", "....."];
+const QZ_FULL = ["#####", "#####", "#####", "#####", "#####"];
+
+function qzNumberFrame(n: number): string[] {
+    // 1..9: one 3x5 digit centred. 10..99: a bar for the tens "1" plus a 3x5 unit digit.
+    const rows: string[] = [];
+    const u = QZ_DIGITS[n % 10];
+    for (let y = 0; y < 5; y++) {
+        if (n < 10) rows.push("." + u[y] + ".");
+        else rows.push("#." + u[y]);
+    }
+    return rows;
+}
+
+function qzBarFrame(lit: number): string[] {
+    const rows: string[] = [];
+    for (let y = 0; y < 5; y++) {
+        let r = "";
+        for (let x = 0; x < 5; x++) r += (y * 5 + x < lit) ? "#" : ".";
+        rows.push(r);
+    }
+    return rows;
+}
+
+function qzFrame(mode: number, a: number, b: number, t: number): string[] {
+    if (mode == QZ_D_UNASSIGNED) return QZ_ICON_QUESTION;
+    if (mode == QZ_D_IDLE) return qzNumberFrame(a);
+    if (mode == QZ_D_WAIT) return qzBarFrame(a);
+    if (mode == QZ_D_LOCKED || mode == QZ_D_CLOSED) {
+        if (a < 1 || a > 5) return QZ_ICON_DASH;
+        if (mode == QZ_D_LOCKED && b == 0) return (t % QZ_BLINK_PERIOD_MS) < QZ_BLINK_ON_MS ? QZ_LETTERS[a - 1] : QZ_BLANK;
+        return QZ_LETTERS[a - 1];
+    }
+    if (mode == QZ_D_RESULT) return a == 1 ? QZ_ICON_CHECK : (a == 2 ? QZ_ICON_CROSS : QZ_ICON_DASH);
+    if (mode == QZ_D_NOLINK) return QZ_ICON_NOLINK;
+    if (mode == QZ_D_IDENT) {
+        const step = Math.idiv(t, QZ_IDENT_STEP_MS);
+        if (step < QZ_IDENT_STEPS) return (step % 2) == 0 ? QZ_BLANK : QZ_FULL;
+        return a > 0 ? qzNumberFrame(a) : QZ_BLANK;
+    }
+    return QZ_BLANK;
+}
+
+// ===== team_main.ts =====
+// =============================================================================
+//  TEAM DEVICE - MakeCode glue (micro:bit on an edu:bit, answer keys on pins).
+//  All game logic lives in qz_team.ts; this file only talks to the hardware.
+// =============================================================================
+
+// ---- EDIT ME: which input drives each answer (A, B, C, D, E) ---------------
+
+const QZ_BTN_A = 1000;
+const QZ_BTN_B = 1001;
+const QZ_KEY_SOURCES: number[] = [QZ_BTN_A, QZ_BTN_B, DigitalPin.P8, DigitalPin.P12]; 
+const QZ_VOLUME = 200;          // 0..255
+
+// ---- hardware access --------------------------------------------------------
+let qzSoundQueue: number[] = [];
+// Current display state, written by the HAL and read by the display fiber (cooperative fibers: no tearing).
+let qzDMode = QZ_D_UNASSIGNED;
+let qzDA = 0;
+let qzDB = 0;
+let qzDSince = 0;               // control.millis() when the state last changed (drives blinking and flashes)
+
+class TeamHal implements QzTeamHal {
+    radioSend(bytes: number[]): void {
+        const b = control.createBuffer(bytes.length);
+        for (let i = 0; i < bytes.length; i++) b[i] = bytes[i];
+        radio.sendBuffer(b);
+    }
+    sound(id: number): void {
+        if (qzSoundQueue.length < 6) qzSoundQueue.push(id);
+    }
+    display(mode: number, a: number, b: number): void {
+        if (mode != qzDMode || a != qzDA || b != qzDB) {
+            qzDMode = mode; qzDA = a; qzDB = b; qzDSince = control.millis();
+        }
+    }
+}
+
+function qzBufToArray(b: Buffer): number[] {
+    const out: number[] = [];
+    for (let i = 0; i < b.length; i++) out.push(b[i]);
+    return out;
+}
+
+function qzReadKey(src: number): boolean {
+    if (src == QZ_BTN_A) return input.buttonIsPressed(Button.A);
+    if (src == QZ_BTN_B) return input.buttonIsPressed(Button.B);
+    return pins.digitalReadPin(src) == 0;      // active low, pull-up enabled
+}
+
 function qzDraw(rows: string[]) {
     for (let y = 0; y < 5; y++) {
         for (let x = 0; x < 5; x++) {
@@ -676,59 +736,7 @@ function qzDraw(rows: string[]) {
     }
 }
 
-function qzDrawNumber(n: number) {
-    // 1..9: one 3x5 digit centred. 10..99: a bar for the tens "1" plus a 3x5 unit digit.
-    const rows: string[] = [];
-    const u = QZ_DIGITS[n % 10];
-    for (let y = 0; y < 5; y++) {
-        if (n < 10) rows.push("." + u[y] + ".");
-        else rows.push("#." + u[y]);
-    }
-    qzDraw(rows);
-}
-
-function qzDrawBar(lit: number) {
-    for (let i = 0; i < 25; i++) {
-        if (i < lit) led.plot(i % 5, Math.idiv(i, 5)); else led.unplot(i % 5, Math.idiv(i, 5));
-    }
-}
-
-function qzRender() {
-    const mode = qzDMode;
-    const a = qzDA;
-    const b = qzDB;
-    qzDDirty = false;
-    if (mode == QZ_D_UNASSIGNED) qzDraw(QZ_ICON_QUESTION);
-    else if (mode == QZ_D_IDLE) qzDrawNumber(a);
-    else if (mode == QZ_D_WAIT) qzDrawBar(a);
-    else if (mode == QZ_D_LOCKED || mode == QZ_D_CLOSED) {
-        if (a >= 1 && a <= 5) {
-            if (mode == QZ_D_LOCKED && b == 0) {
-                // not yet acknowledged by the base: blink so the team knows
-                for (let i = 0; i < 4 && !qzDDirty; i++) {
-                    qzDraw(QZ_LETTERS[a - 1]); basic.pause(250);
-                    qzDraw([]); basic.pause(100);
-                }
-                if (!qzDDirty) qzDDirty = true;   // keep blinking until state changes
-                qzDMode = mode; qzDA = a; qzDB = b;
-            } else {
-                qzDraw(QZ_LETTERS[a - 1]);
-            }
-        } else qzDraw(QZ_ICON_DASH);
-    } else if (mode == QZ_D_RESULT) {
-        if (a == 1) qzDraw(QZ_ICON_CHECK);
-        else if (a == 2) qzDraw(QZ_ICON_CROSS);
-        else qzDraw(QZ_ICON_DASH);
-    } else if (mode == QZ_D_NOLINK) qzDraw(QZ_ICON_NOLINK);
-    else if (mode == QZ_D_IDENT) {
-        for (let i = 0; i < 3 && !qzDDirty; i++) {
-            basic.clearScreen(); basic.pause(120);
-            for (let y = 0; y < 5; y++) for (let x = 0; x < 5; x++) led.plot(x, y);
-            basic.pause(120);
-        }
-        if (a > 0 && !qzDDirty) qzDrawNumber(a);
-    }
-}
+let qzLastFrame = "";
 
 function qzPlay(id: number) {
     if (id == QZ_S_LOCK) { music.playTone(880, 60); }
@@ -772,7 +780,10 @@ control.inBackground(function () {
 // Display and sound run in their own fibers so they can block without delaying key scanning.
 control.inBackground(function () {
     while (true) {
-        if (qzDDirty) qzRender();
+        // Never blocks and never keeps a copy of the state: draw whatever the CURRENT state looks like now.
+        const frame = qzFrame(qzDMode, qzDA, qzDB, control.millis() - qzDSince);
+        const key = frame.join("");
+        if (key != qzLastFrame) { qzLastFrame = key; qzDraw(frame); }
         basic.pause(20);
     }
 });

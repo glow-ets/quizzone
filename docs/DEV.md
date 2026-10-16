@@ -28,8 +28,8 @@ Glow ETS (https://glow.earth) is a cultural association that offers, organizes, 
 
 ## Done and tested without hardware
 
-- MakeCode firmware (team, base, pin probe): types checked against the real MakeCode declarations; 29 tests on a virtual-time radio simulator (collisions, 30% packet loss, blackout, 15 simultaneous presses).
-- Server: game engine, HTTP/SSE, resume after restart; 80 Python tests, including an end-to-end test running the real firmware code in real time and a browser test.
+- MakeCode firmware (team, base, pin probe): types checked against the real MakeCode declarations; 50 tests: protocol/team logic on a virtual-time radio simulator (collisions, 30% packet loss, blackout, 15 simultaneous presses), the pure display frame function, and the real MakeCode glue (`team_main.ts`, `base_main.ts`) run on fake MakeCode globals with a virtual clock.
+- Server: game engine, HTTP/SSE, resume after restart; 89 Python tests, including an end-to-end test running the real firmware code in real time and a browser test.
 - Italian/English interface, all colors in `server/web/static/theme.css`.
 
 ## To do with the hardware (see [docs/TEST_PROTOCOL.md](docs/TEST_PROTOCOL.md))

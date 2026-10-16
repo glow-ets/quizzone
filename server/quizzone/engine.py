@@ -17,6 +17,7 @@ Rules (see protocol/PROTOCOL.md for the reasoning):
 from __future__ import annotations
 
 import csv
+import re
 import io
 import threading
 import time
@@ -131,6 +132,7 @@ class Engine:
         self.scores: Dict[int, int] = {}
         self.devices: Dict[int, Device] = {}
         self.slot_owner: Dict[int, int] = {}
+        self.dismissed: Dict[int, dict] = {}     # forgotten devices: serial -> {"slot": last team or None}
         self.history: List[dict] = []
         self.adjustments: List[dict] = []
 
@@ -256,6 +258,7 @@ class Engine:
         if dev is None:
             dev = Device(serial=st.serial, first_seen=now)
             self.devices[st.serial] = dev
+            self.dismissed.pop(st.serial, None)            # it talked again: no longer "forgotten"
             self._log("log.device_new", serial=f"{st.serial:08X}")
         # --- link statistics from the sequence number
         if dev.seq_last >= 0:
@@ -614,10 +617,53 @@ class Engine:
             dev = self._dev_arg(serial)
             if self._online(dev, self.clock()):
                 raise CommandError("err.device_online")
+            self.dismissed[dev.serial] = {"slot": dev.slot}      # remembered, so it can be restored
             if dev.slot is not None and self.slot_owner.get(dev.slot) == dev.serial:
                 del self.slot_owner[dev.slot]
             del self.devices[dev.serial]
+            self._log("log.device_forgotten", serial=f"{dev.serial:08X}")
             self._persist(self.clock())
+
+    def _register_device(self, serial: int, slot: Optional[int], why_key: str):
+        """Create a device record without waiting to hear from it (it shows as offline until it talks)."""
+        now = self.clock()
+        dev = Device(serial=serial, first_seen=now)
+        self.devices[serial] = dev
+        self.dismissed.pop(serial, None)
+        if slot is not None and 0 <= slot < self.cfg.teams and slot not in self.slot_owner:
+            self._bind(dev, slot, why_key)
+        else:
+            self._log("log.device_added", serial=f"{serial:08X}")
+        self._persist(now)
+
+    def cmd_restore_device(self, serial: str = "", **_):
+        """Bring back a forgotten device, with the team it had if that team is still free."""
+        with self.lock:
+            try:
+                s = int(str(serial), 16) & 0xFFFFFFFF
+            except ValueError:
+                raise CommandError("err.bad_argument")
+            if s in self.devices:
+                raise CommandError("err.device_exists")
+            if s not in self.dismissed:
+                raise CommandError("err.unknown_device")
+            self._register_device(s, self.dismissed[s].get("slot"), "log.device_restored")
+
+    def cmd_add_device(self, serial: str = "", slot=None, **_):
+        """Register a device by its serial number (8 hex digits, as printed in the device list)."""
+        with self.lock:
+            text = str(serial).strip()
+            if not re.fullmatch(r"[0-9A-Fa-f]{1,8}", text):
+                raise CommandError("err.bad_argument")
+            s = int(text, 16)
+            if slot is not None and (not isinstance(slot, int) or isinstance(slot, bool)
+                                     or not (0 <= slot < self.cfg.teams)):
+                raise CommandError("err.bad_argument")
+            if s in self.devices:
+                raise CommandError("err.device_exists")
+            if slot is not None and slot in self.slot_owner:
+                raise CommandError("err.slot_taken")
+            self._register_device(s, slot, "log.device_added_to")
 
     def cmd_identify(self, serial: str = "", **_):
         with self.lock:
@@ -729,6 +775,7 @@ class Engine:
             "names": self.names, "enabled": self.enabled,
             "devices": {f"{s:08X}": {"slot": d.slot, "first_wall": self.wall() - (now - d.first_seen)}
                         for s, d in self.devices.items() if d.slot is not None},
+            "dismissed": {f"{k:08X}": v for k, v in self.dismissed.items()},
             "scores": {str(k): v for k, v in self.scores.items()},
             "history": self.history, "adjustments": self.adjustments,
             "game": {"cursor": self.cursor, "phase": self.phase, "qseq": self.qseq,
@@ -756,6 +803,7 @@ class Engine:
                     setattr(self.cfg, k, c[k])
             self.names = (d.get("names", []) + [None] * P.MAX_TEAMS)[:P.MAX_TEAMS]
             self.enabled = (d.get("enabled", []) + [False] * P.MAX_TEAMS)[:P.MAX_TEAMS]
+            self.dismissed = {int(k, 16): {"slot": v.get("slot")} for k, v in d.get("dismissed", {}).items()}
             self.scores = {int(k): int(v) for k, v in d.get("scores", {}).items()}
             self.history = d.get("history", [])
             self.adjustments = d.get("adjustments", [])
@@ -860,6 +908,7 @@ class Engine:
             if control:
                 snap["devices"] = [self._device_view(d, now) for d in sorted(
                     self.devices.values(), key=lambda d: (d.slot is None, d.slot if d.slot is not None else 0, d.serial))]
+                snap["dismissed"] = [{"serial": f"{k:08X}", "slot": v.get("slot")} for k, v in sorted(self.dismissed.items())]
                 snap["config"] = self.cfg.to_dict()
                 snap["unconfirmed"] = [s + 1 for s in self.unconfirmed]
                 snap["unsynced"] = sorted(d.slot + 1 for d in self.devices.values()

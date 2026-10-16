@@ -67,7 +67,7 @@ function makecodeDeclarations() {
 
 // Project definitions: file order matters (main file last), exactly as in the MakeCode project.
 export const PROJECTS = {
-  team: ['qz_config.ts', 'qz_protocol.ts', 'qz_team.ts', 'team_main.ts'],
+  team: ['qz_config.ts', 'qz_protocol.ts', 'qz_team.ts', 'qz_display.ts', 'team_main.ts'],
   base: ['qz_config.ts', 'qz_protocol.ts', 'qz_base.ts', 'base_main.ts'],
   probe: ['probe_main.ts'],
 };

@@ -46,6 +46,7 @@ function render() {
 
   paint("teams", teamsHtml(s));
   paint("devices", devicesHtml(s));
+  paint("dev-extra", deviceExtraHtml(s));
   paint("cfg", cfgHtml(s));
   paint("report", reportHtml(s));
   paint("log", s.log.slice().reverse().map(l => `<div class="${l.l === "warn" ? "warn" : ""}">${new Date(l.t * 1000).toLocaleTimeString()} ${esc(t(l.k, l.a))}</div>`).join(""));
@@ -81,6 +82,17 @@ function devicesHtml(s) {
     <td><button class="btn" data-ident="${d.serial}">${esc(t("ctl.identify"))}</button>${d.online ? "" : ` <button class="btn danger" data-forget="${d.serial}">${esc(t("ctl.forget"))}</button>`}</td></tr>`).join("");
   return `<table><thead><tr><th>ID</th><th>${esc(t("ctl.team"))}</th><th>${esc(t("ctl.signal"))}</th><th>${esc(t("ctl.loss"))}</th><th>${esc(t("ctl.presses"))}</th><th>${esc(t("ctl.bounces"))}</th><th></th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
 }
+function deviceExtraHtml(s) {
+  const team = x => `<option value="${x.slot}">${x.slot + 1}</option>`;
+  const dismissed = (s.dismissed || []).map(d => `<tr><td><code>${esc(d.serial)}</code></td>
+    <td>${d.slot === null || d.slot === undefined ? "" : esc(t("ctl.team") + " " + (d.slot + 1))}</td>
+    <td><button class="btn" data-restore="${esc(d.serial)}">${esc(t("ctl.restore"))}</button></td></tr>`).join("");
+  return `${dismissed ? `<h3>${esc(t("ctl.dismissed"))}</h3><table><tbody>${dismissed}</tbody></table>` : ""}
+    <h3>${esc(t("ctl.add_device"))}</h3>
+    <div class="row"><input type="text" id="add-serial" class="name" maxlength="8" placeholder="${esc(t("ctl.serial_hint"))}" aria-label="${esc(t("ctl.serial"))}" autocomplete="off">
+    <select id="add-slot" aria-label="${esc(t("ctl.team"))}"><option value="">–</option>${s.teams.map(team).join("")}</select>
+    <button class="btn" id="add-btn">${esc(t("ctl.add"))}</button></div>`;
+}
 function cfgHtml(s) {
   const c = s.config;
   const chk = (k) => `<label class="row"><input type="checkbox" data-cfg="${k}" ${c[k] ? "checked" : ""}> ${esc(t("cfg." + k))}</label>`;
@@ -110,6 +122,11 @@ document.addEventListener("click", ev => {
   if (b.dataset.adj) { const [sl, d] = b.dataset.adj.split(":").map(Number); return run("adjust", { slot: sl, delta: d }); }
   if (b.dataset.ident) return run("identify", { serial: b.dataset.ident });
   if (b.dataset.forget) return run("forget_device", { serial: b.dataset.forget }, "confirm.forget");
+  if (b.dataset.restore) return run("restore_device", { serial: b.dataset.restore });
+  if (b.id === "add-btn") {
+    const slot = $("add-slot").value;
+    return run("add_device", { serial: $("add-serial").value, slot: slot === "" ? null : +slot }).then(() => { rendered = {}; });
+  }
   if (b.id === "auto") return run("auto_assign");
   if (b.id === "blast") return run("test", { seconds: 6 });
   if (b.id === "reset") { if (confirm(t("confirm.reset"))) run("reset_game", { confirm: true }); }

@@ -117,5 +117,17 @@
  "err.unknown_command": "Unknown command.",
  "err.unauthorized": "Not authorised: the token is missing from the address.",
  "err.network": "Server unreachable.",
- "ctl.unsynced": "These teams have not confirmed their number yet (wait a few seconds before starting): {teams}"
+ "ctl.unsynced": "These teams have not confirmed their number yet (wait a few seconds before starting): {teams}",
+ "ctl.dismissed": "Forgotten devices",
+ "ctl.restore": "Restore",
+ "ctl.add_device": "Add a device",
+ "ctl.serial": "Serial number",
+ "ctl.serial_hint": "ID (8 digits)",
+ "ctl.add": "Add",
+ "log.device_forgotten": "Device {serial} forgotten",
+ "log.device_added": "Device {serial} added",
+ "log.device_restored": "Device {serial} restored as team {team}",
+ "log.device_added_to": "Device {serial} added as team {team}",
+ "err.device_exists": "The device is already in the list.",
+ "err.slot_taken": "That team already has a device."
 }

@@ -117,5 +117,17 @@
  "err.unknown_command": "Comando sconosciuto.",
  "err.unauthorized": "Non autorizzato: manca il token nell'indirizzo.",
  "err.network": "Server non raggiungibile.",
- "ctl.unsynced": "Queste squadre non hanno ancora confermato il loro numero (aspetta qualche secondo prima di cominciare): {teams}"
+ "ctl.unsynced": "Queste squadre non hanno ancora confermato il loro numero (aspetta qualche secondo prima di cominciare): {teams}",
+ "ctl.dismissed": "Dispositivi dimenticati",
+ "ctl.restore": "Ripristina",
+ "ctl.add_device": "Aggiungi un dispositivo",
+ "ctl.serial": "Numero di serie",
+ "ctl.serial_hint": "ID (8 cifre)",
+ "ctl.add": "Aggiungi",
+ "log.device_forgotten": "Dispositivo {serial} dimenticato",
+ "log.device_added": "Dispositivo {serial} aggiunto",
+ "log.device_restored": "Dispositivo {serial} ripristinato come squadra {team}",
+ "log.device_added_to": "Dispositivo {serial} aggiunto come squadra {team}",
+ "err.device_exists": "Il dispositivo è già nell'elenco.",
+ "err.slot_taken": "Quella squadra ha già un dispositivo."
 }

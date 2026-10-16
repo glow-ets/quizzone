@@ -39,34 +39,30 @@ serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
     qzBase.onSerialLine(serial.readUntil(serial.delimiters(Delimiters.NewLine)), control.millis());
 });
 
-basic.showString("Q");
+// Display: never use basic.showString / showLeds here. They block for hundreds of milliseconds, and this
+// loop also sends the beacons and forwards the team packets to the PC: a blocked loop means a deaf base.
+const QZ_BASE_Q = [".###.", "#...#", "#.#.#", "#..##", ".####"];
+const QZ_BASE_NOSERVER = [".##.#", "#..##", "#..##", ".##..", "..###"];
+let qzBaseLastFrame = "";
+
+function qzBaseDraw(rows: string[]) {
+    const key = rows.join("");
+    if (key == qzBaseLastFrame) return;          // only touch the LEDs when the picture changes
+    qzBaseLastFrame = key;
+    for (let y = 0; y < 5; y++) {
+        for (let x = 0; x < 5; x++) {
+            if (rows[y].charAt(x) == "#") led.plot(x, y); else led.unplot(x, y);
+        }
+    }
+}
 
 control.inBackground(function () {
-    let blink = false;
-    let lastBlink = 0;
     while (true) {
         const now = control.millis();
         qzBase.tick(now);
-        if (now - lastBlink >= 500) {
-            lastBlink = now;
-            blink = !blink;
-            // usually Q, with added blinking ! if server not alive
-            if (qzBase.serverAlive(now)) { 
-                basic.showString("Q");
-            } else {
-                if (blink){
-                    basic.showString("Q");
-                } else {
-                    basic.showLeds(`
-. # # . #
-# . . # #
-# . . # #
-. # # . .
-. . # # #
-`); 
-                }
-            }
-        }
+        // steady Q while the server is alive; Q and a "no server" picture alternate every 500 ms otherwise
+        if (qzBase.serverAlive(now) || (Math.idiv(now, 500) % 2) == 0) qzBaseDraw(QZ_BASE_Q);
+        else qzBaseDraw(QZ_BASE_NOSERVER);
         basic.pause(1);
     }
 });
