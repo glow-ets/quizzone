@@ -64,6 +64,10 @@ Not used now, maybe we will for other purposes.
 
 (Colours per M5Stack's documentation for the Unit Key; verify with a multimeter before powering many units.)
 
+## Coding
+
+- Make sure there is at least a constructor in classes, if not just add a `constructor() { }` otherwise Makecode complains.
+
 ## Build and flash
 
 ```
