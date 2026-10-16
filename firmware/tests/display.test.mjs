@@ -144,12 +144,17 @@ test('system: a refused press never makes the display claim an answer', () => {
   assert.ok(teams[0].sounds.some((s) => s.id === FW.QZ_S_INVALID));
 });
 
-test('display: local test mode shows a blinking right-hand "!" or the pressed letter', () => {
-  const { qzFrame, QZ_D_LOCAL, QZ_ICON_BANG, QZ_BLANK, QZ_LETTERS, QZ_LOCAL_BLINK_MS } = FW;
+test('display: local test mode shows "T" with a blinking right-hand "!", or the pressed letter', () => {
+  const { qzFrame, QZ_D_LOCAL, QZ_ICON_BANG, QZ_ICON_BANG_BLANK, QZ_LETTERS, QZ_LOCAL_BLINK_MS } = FW;
   const on = [], off = [];
-  for (let t = 0; t < 3 * QZ_LOCAL_BLINK_MS; t += 10) (qzFrame(QZ_D_LOCAL, 0, 0, t).join('|') === QZ_ICON_BANG.join('|') ? on : off).push(t);
+  for (let t = 0; t < 3 * QZ_LOCAL_BLINK_MS; t += 10) {
+    const f = qzFrame(QZ_D_LOCAL, 0, 0, t).join('|');
+    if (f === QZ_ICON_BANG.join('|')) on.push(t); else if (f === QZ_ICON_BANG_BLANK.join('|')) off.push(t); else assert.fail('unexpected frame at ' + t);
+  }
   assert.ok(on.length > 0 && off.length > 0, 'it blinks');
-  for (const row of QZ_ICON_BANG) assert.equal(row.slice(0, 4), '....', 'only the right-hand column is lit');
+  // the two blink frames differ only in the right-hand column: the "T" stays put, the "!" blinks
+  for (let y = 0; y < 5; y++) assert.equal(QZ_ICON_BANG[y].slice(0, 4), QZ_ICON_BANG_BLANK[y].slice(0, 4));
+  assert.notEqual(QZ_ICON_BANG.join(''), QZ_ICON_BANG_BLANK.join(''));
   for (let i = 1; i <= 5; i++) assert.equal(qzFrame(QZ_D_LOCAL, i, 0, 123).join('|'), QZ_LETTERS[i - 1].join('|'));
 });
 

@@ -172,6 +172,7 @@ test('glue: the edge-connector audio pin (P0) is released except while a sound p
 });
 
 const BANG = (dev) => dev.ev('QZ_ICON_BANG').join('|');
+const BANG_OFF = (dev) => dev.ev('QZ_ICON_BANG_BLANK').join('|');
 
 test('glue: local test mode - blinking "!", letters on key press, nothing on the radio, incoming ignored, exit restores', async () => {
   const dev = makeDevice();
@@ -185,7 +186,7 @@ test('glue: local test mode - blinking "!", letters on key press, nothing on the
   // 1. blinking "!" on the right side, nothing else
   const seen = new Set();
   for (let i = 0; i < 60; i++) await dev.run(25, () => seen.add(dev.screen().join('|')));
-  assert.deepEqual([...seen].sort(), [BANG(dev), BLANK].sort(), '"!" blinks between lit and dark');
+  assert.deepEqual([...seen].sort(), [BANG(dev), BANG_OFF(dev)].sort(), '"!" blinks between lit and dark');
 
   // 2. pressing a key shows its letter (A..D), holding it keeps it, and it falls back to "!" after release
   const keys = [['A', 0], ['B', 1]];
@@ -197,7 +198,7 @@ test('glue: local test mode - blinking "!", letters on key press, nothing on the
     dev.input[k] = false; await dev.run(100);
     assert.equal(dev.screen().join('|'), LETTER(dev, idx), 'letter lingers briefly after release');
     await dev.run(700);
-    assert.ok([BANG(dev), BLANK].includes(dev.screen().join('|')), 'back to the blinking "!"');
+    assert.ok([BANG(dev), BANG_OFF(dev)].includes(dev.screen().join('|')), 'back to the blinking "!"');
   }
 
   // incoming radio is ignored: beacons with an open question and a new assignment change nothing
@@ -206,7 +207,7 @@ test('glue: local test mode - blinking "!", letters on key press, nothing on the
   assert.equal(dev.ev('qzDMode'), modeBefore, 'game state untouched by radio received in test mode');
   const seen2 = new Set();
   for (let i = 0; i < 60; i++) await dev.run(25, () => seen2.add(dev.screen().join('|')));
-  assert.deepEqual([...seen2].sort(), [BANG(dev), BLANK].sort());
+  assert.deepEqual([...seen2].sort(), [BANG(dev), BANG_OFF(dev)].sort());
 
   // nothing was transmitted during the whole test mode, key presses included
   assert.equal(dev.sent.length, sentAtEntry, 'no radio packets in test mode');

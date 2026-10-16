@@ -115,7 +115,7 @@ indicator still blinks on your hardware, report it: the next options are moving 
 
 ## Local test mode (team device)
 
-Touch the gold logo on the micro:bit to enter local test mode: a "!" blinks on the right-hand column of the
+Touch the gold logo on the micro:bit to enter local test mode: a "T" is shown with a "!" blinking on the right of the
 display, nothing is sent on the radio and everything received is ignored. Pressing an answer key shows its
 letter (and plays a beep, which also tests the speaker). Touch the logo again to leave; the device returns to
 the game within a second. Requires a micro:bit V2 (the touch logo does not exist on V1; the team firmware
