@@ -143,3 +143,30 @@ test('system: a refused press never makes the display claim an answer', () => {
   assert.equal(lastDisplay(teams[0]).mode, FW.QZ_D_WAIT);
   assert.ok(teams[0].sounds.some((s) => s.id === FW.QZ_S_INVALID));
 });
+
+test('display: local test mode shows a blinking right-hand "!" or the pressed letter', () => {
+  const { qzFrame, QZ_D_LOCAL, QZ_ICON_BANG, QZ_BLANK, QZ_LETTERS, QZ_LOCAL_BLINK_MS } = FW;
+  const on = [], off = [];
+  for (let t = 0; t < 3 * QZ_LOCAL_BLINK_MS; t += 10) (qzFrame(QZ_D_LOCAL, 0, 0, t).join('|') === QZ_ICON_BANG.join('|') ? on : off).push(t);
+  assert.ok(on.length > 0 && off.length > 0, 'it blinks');
+  for (const row of QZ_ICON_BANG) assert.equal(row.slice(0, 4), '....', 'only the right-hand column is lit');
+  for (let i = 1; i <= 5; i++) assert.equal(qzFrame(QZ_D_LOCAL, i, 0, 123).join('|'), QZ_LETTERS[i - 1].join('|'));
+});
+
+test('display: QzLocalTest shows the last pressed letter, holds it briefly after release, beeps once per press', () => {
+  const { QzLocalTest, QZ_LOCAL_HOLD_MS } = FW;
+  const lt = new QzLocalTest();
+  assert.equal(lt.onKeys([false, false, false, false], 0), false);
+  assert.equal(lt.show, 0);
+  assert.equal(lt.onKeys([false, true, false, false], 10), true);
+  assert.equal(lt.show, 2);
+  assert.equal(lt.onKeys([false, true, false, false], 20), false, 'holding is not a new press');
+  assert.equal(lt.onKeys([false, true, true, false], 30), true);
+  assert.equal(lt.show, 3, 'the newest press wins');
+  lt.onKeys([false, false, false, false], 40);
+  assert.equal(lt.show, 3, 'still visible right after release');
+  lt.onKeys([false, false, false, false], 30 + QZ_LOCAL_HOLD_MS - 1);
+  assert.equal(lt.show, 3);
+  lt.onKeys([false, false, false, false], 30 + QZ_LOCAL_HOLD_MS + 1);
+  assert.equal(lt.show, 0);
+});

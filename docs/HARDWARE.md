@@ -108,3 +108,11 @@ edu:bit's P0 current indicator blinks even when nothing is playing. The team fir
 audio pin released (`pins.setAudioPinEnabled(false)`) and connects it only while a sound is playing. If the
 indicator still blinks on your hardware, report it: the next options are moving the speaker to another pin
 (`pins.setAudioPin`) or `music.setSilenceLevel`.
+
+## Local test mode (team device)
+
+Touch the gold logo on the micro:bit to enter local test mode: a "!" blinks on the right-hand column of the
+display, nothing is sent on the radio and everything received is ignored. Pressing an answer key shows its
+letter (and plays a beep, which also tests the speaker). Touch the logo again to leave; the device returns to
+the game within a second. Requires a micro:bit V2 (the touch logo does not exist on V1; the team firmware
+needs a V2 anyway for the sound).

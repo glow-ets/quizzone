@@ -28,10 +28,11 @@ function makeDevice() {
     __fibers: [],
     basic: { pause: (ms) => new Promise((r) => sleepers.push({ t: now + ms, r })), clearScreen: () => leds.forEach((r) => r.fill(false)) },
     radio: { setGroup() {}, setFrequencyBand() {}, setTransmitPower() {}, setTransmitSerialNumber() {},
-      sendBuffer: (b) => sent.push([...b]), onReceivedBuffer: () => {} },
+      sendBuffer: (b) => sent.push([...b]), onReceivedBuffer: (fn) => { g.__rx = fn; } },
     music: { setVolume() {}, playTone: (f, d) => { tones.push(f); return g.basic.pause(d); } },
     pins: { setPull() {}, digitalReadPin: () => 1, setAudioPinEnabled: (e) => { audioPin.push([now, e]); } },
-    input: { buttonIsPressed: (b) => input[b] },
+    input: { buttonIsPressed: (b) => input[b], onLogoEvent: (e, fn) => { g.__logo = fn; } },
+    TouchButtonEvent: { Pressed: 'pressed' },
     led: { plot: (x, y) => { leds[y][x] = true; }, unplot: (x, y) => { leds[y][x] = false; } },
     serial: {},
   };
@@ -67,6 +68,8 @@ function makeDevice() {
       now = end; await flush();
     },
     ev: (code) => vm.runInContext(code, ctx),
+    logo() { g.__logo(); },
+    radioRx(bytes) { g.__rx(new Uint8Array(bytes)); },
     packet(bytes) { vm.runInContext(`qzTeam.onPacket(${JSON.stringify(bytes)}, control.millis())`, ctx); },
   };
   return dev;
@@ -166,4 +169,67 @@ test('glue: the edge-connector audio pin (P0) is released except while a sound p
   assert.equal(states[states.length - 1], false, 'released again once the queue is empty');
   await dev.run(5000);                                  // idle: nothing may re-enable it
   assert.equal(dev.audioPin.length, 3);
+});
+
+const BANG = (dev) => dev.ev('QZ_ICON_BANG').join('|');
+
+test('glue: local test mode - blinking "!", letters on key press, nothing on the radio, incoming ignored, exit restores', async () => {
+  const dev = makeDevice();
+  await join(dev, 1);
+  await beacons(dev, 600, () => ({ phase: 0 }));
+  const modeBefore = dev.ev('qzDMode');
+  dev.logo();                                           // enter test mode
+  await dev.run(100);
+  const sentAtEntry = dev.sent.length;
+
+  // 1. blinking "!" on the right side, nothing else
+  const seen = new Set();
+  for (let i = 0; i < 60; i++) await dev.run(25, () => seen.add(dev.screen().join('|')));
+  assert.deepEqual([...seen].sort(), [BANG(dev), BLANK].sort(), '"!" blinks between lit and dark');
+
+  // 2. pressing a key shows its letter (A..D), holding it keeps it, and it falls back to "!" after release
+  const keys = [['A', 0], ['B', 1]];
+  for (const [k, idx] of keys) {
+    dev.input[k] = true; await dev.run(150);
+    assert.equal(dev.screen().join('|'), LETTER(dev, idx), `key ${k} shows its letter`);
+    await dev.run(1000);
+    assert.equal(dev.screen().join('|'), LETTER(dev, idx), `held key ${k} keeps its letter`);
+    dev.input[k] = false; await dev.run(100);
+    assert.equal(dev.screen().join('|'), LETTER(dev, idx), 'letter lingers briefly after release');
+    await dev.run(700);
+    assert.ok([BANG(dev), BLANK].includes(dev.screen().join('|')), 'back to the blinking "!"');
+  }
+
+  // incoming radio is ignored: beacons with an open question and a new assignment change nothing
+  for (let i = 0; i < 20; i++) { dev.radioRx(beacon(dev, { phase: 1, elapsed: 100 * i })); await dev.run(100); }
+  dev.radioRx(assign(dev, 5)); await dev.run(300);
+  assert.equal(dev.ev('qzDMode'), modeBefore, 'game state untouched by radio received in test mode');
+  const seen2 = new Set();
+  for (let i = 0; i < 60; i++) await dev.run(25, () => seen2.add(dev.screen().join('|')));
+  assert.deepEqual([...seen2].sort(), [BANG(dev), BLANK].sort());
+
+  // nothing was transmitted during the whole test mode, key presses included
+  assert.equal(dev.sent.length, sentAtEntry, 'no radio packets in test mode');
+  assert.ok(dev.tones.length > 0);
+
+  // 3. leave: back to the game; a key still held at that moment is not counted as an answer
+  dev.input.A = true;
+  dev.logo(); await dev.run(500);
+  dev.input.A = false; await dev.run(100);
+  await beacons(dev, 800, () => ({ phase: 0 }));
+  assert.equal(dev.screen().join('|'), dev.ev('qzFrame(QZ_D_IDLE, 2, 0, 0)').join('|'), 'idle again, old team number');
+  await beacons(dev, 600, () => ({ phase: 1, q: 9 }));
+  dev.input.B = true; await dev.run(150); dev.input.B = false;
+  await beacons(dev, 300, () => ({ phase: 1, q: 9 }));
+  assert.equal(dev.ev('qzDMode'), dev.ev('QZ_D_LOCKED'), 'normal play works after leaving test mode');
+  assert.equal(dev.ev('qzDA'), 2, 'the answer is B: the key held while leaving was not an answer');
+});
+
+test('glue: touching the logo twice quickly counts once (touch bounce)', async () => {
+  const dev = makeDevice();
+  await join(dev, 0);
+  dev.logo(); dev.logo(); await dev.run(200);
+  const seen = new Set();
+  for (let i = 0; i < 40; i++) await dev.run(25, () => seen.add(dev.screen().join('|')));
+  assert.ok(seen.has(BANG(dev)), 'still in test mode');
 });

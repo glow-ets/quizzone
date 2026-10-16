@@ -277,6 +277,7 @@ const QZ_D_CLOSED = 4;    // a = answer 1..5 or 0
 const QZ_D_RESULT = 5;    // a = 1 correct, 2 wrong, 3 no answer
 const QZ_D_NOLINK = 6;
 const QZ_D_IDENT = 7;
+const QZ_D_LOCAL = 8;      // local test mode: a = letter 1..5 to show, 0 = none (blinking "!")
 
 // Sounds requested from the glue (played by a background fiber).
 const QZ_S_LOCK = 1;
@@ -636,6 +637,11 @@ const QZ_BLINK_ON_MS = 250;
 const QZ_IDENT_STEP_MS = 120;        // identify: 3 flashes of 2 steps (dark, full), then the team number
 const QZ_IDENT_STEPS = 6;
 
+// Local test mode: a blinking "!" in the right-hand column (same shape as on the base station).
+const QZ_ICON_BANG = ["....#", "....#", "....#", ".....", "....#"];
+const QZ_LOCAL_BLINK_MS = 700;       // full period of the "!" blink
+const QZ_LOCAL_HOLD_MS = 400;        // a pressed letter stays visible this long after the key is released
+
 const QZ_BLANK = [".....", ".....", ".....", ".....", "....."];
 const QZ_FULL = ["#####", "#####", "#####", "#####", "#####"];
 
@@ -671,12 +677,44 @@ function qzFrame(mode: number, a: number, b: number, t: number): string[] {
     }
     if (mode == QZ_D_RESULT) return a == 1 ? QZ_ICON_CHECK : (a == 2 ? QZ_ICON_CROSS : QZ_ICON_DASH);
     if (mode == QZ_D_NOLINK) return QZ_ICON_NOLINK;
+    if (mode == QZ_D_LOCAL) {
+        if (a >= 1 && a <= 5) return QZ_LETTERS[a - 1];
+        return (t % QZ_LOCAL_BLINK_MS) < Math.idiv(QZ_LOCAL_BLINK_MS, 2) ? QZ_ICON_BANG : QZ_BLANK;
+    }
     if (mode == QZ_D_IDENT) {
         const step = Math.idiv(t, QZ_IDENT_STEP_MS);
         if (step < QZ_IDENT_STEPS) return (step % 2) == 0 ? QZ_BLANK : QZ_FULL;
         return a > 0 ? qzNumberFrame(a) : QZ_BLANK;
     }
     return QZ_BLANK;
+}
+
+
+// ---- local test mode: which letter to show for the keys currently pressed ----------------------
+// Pure state machine (the glue only feeds it the key states and draws the result). In this mode the
+// device sends nothing on the radio and ignores everything it receives.
+class QzLocalTest {
+    show = 0;                 // letter 1..5 to display, 0 = none
+    until = 0;                // the letter stays on screen until this time
+    prev: boolean[] = [];
+
+    // Returns true when a key has just been pressed (the glue plays a local beep).
+    onKeys(down: boolean[], now: number): boolean {
+        let fresh = false;
+        let any = false;
+        for (let i = 0; i < down.length; i++) {
+            const was = i < this.prev.length ? this.prev[i] : false;
+            if (down[i]) {
+                any = true;
+                if (!was) { this.show = i + 1; fresh = true; }
+            }
+        }
+        this.prev = [];
+        for (let i = 0; i < down.length; i++) this.prev.push(down[i]);
+        if (any) this.until = now + QZ_LOCAL_HOLD_MS;
+        else if (now >= this.until) this.show = 0;
+        return fresh;
+    }
 }
 
 // ===== team_main.ts =====
@@ -699,6 +737,14 @@ let qzDMode = QZ_D_UNASSIGNED;
 let qzDA = 0;
 let qzDB = 0;
 let qzDSince = 0;               // control.millis() when the state last changed (drives blinking and flashes)
+
+// Local test mode (touch logo, micro:bit V2): nothing is sent or received on the radio, and a pressed
+// key just shows its letter. Touch the logo again to leave it.
+let qzLocal = false;
+let qzLocalSince = 0;
+let qzLogoAt = -1000;
+let qzWaitRelease = false;      // after leaving test mode, keys still held are not fed to the game logic
+const qzLocalTest = new QzLocalTest();
 
 class TeamHal implements QzTeamHal {
     radioSend(bytes: number[]): void {
@@ -765,6 +811,7 @@ for (let i = 0; i < QZ_KEY_SOURCES.length; i++) {
 const qzTeam = new QzTeam(new TeamHal(), control.deviceSerialNumber(), QZ_KEY_SOURCES.length, control.millis());
 
 radio.onReceivedBuffer(function (b: Buffer) {
+    if (qzLocal) return;                 // test mode: incoming radio is ignored
     qzTeam.onPacket(qzBufToArray(b), control.millis());
 });
 
@@ -775,8 +822,18 @@ control.inBackground(function () {
     while (true) {
         const now = control.millis();
         for (let i = 0; i < QZ_KEY_SOURCES.length; i++) down[i] = qzReadKey(QZ_KEY_SOURCES[i]);
-        qzTeam.onKeys(down, now);
-        qzTeam.tick(now);
+        if (qzLocal) {
+            // test mode: no game logic, hence no radio transmission at all
+            if (qzLocalTest.onKeys(down, now) && qzSoundQueue.length < 6) qzSoundQueue.push(QZ_S_LOCK);
+        } else {
+            let anyDown = false;
+            for (let i = 0; i < down.length; i++) if (down[i]) anyDown = true;
+            if (!anyDown) qzWaitRelease = false;
+            if (!qzWaitRelease) {
+                qzTeam.onKeys(down, now);
+                qzTeam.tick(now);
+            }
+        }
         basic.pause(2);
     }
 });
@@ -785,7 +842,9 @@ control.inBackground(function () {
 control.inBackground(function () {
     while (true) {
         // Never blocks and never keeps a copy of the state: draw whatever the CURRENT state looks like now.
-        const frame = qzFrame(qzDMode, qzDA, qzDB, control.millis() - qzDSince);
+        const t = control.millis();
+        const frame = qzLocal ? qzFrame(QZ_D_LOCAL, qzLocalTest.show, 0, t - qzLocalSince)
+                              : qzFrame(qzDMode, qzDA, qzDB, t - qzDSince);
         const key = frame.join("");
         if (key != qzLastFrame) { qzLastFrame = key; qzDraw(frame); }
         basic.pause(20);
@@ -799,4 +858,18 @@ control.inBackground(function () {
             pins.setAudioPinEnabled(false);
         } else basic.pause(10);
     }
+});
+
+// Touch logo toggles local test mode (the logo exists on micro:bit V2 only).
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    const now = control.millis();
+    if (now - qzLogoAt < 400) return;    // a touch can report twice
+    qzLogoAt = now;
+    qzLocal = !qzLocal;
+    qzLocalSince = now;
+    qzLocalTest.show = 0;
+    qzLocalTest.until = 0;
+    qzLocalTest.prev = [];
+    qzWaitRelease = !qzLocal;
+    if (qzSoundQueue.length < 6) qzSoundQueue.push(qzLocal ? QZ_S_ASSIGNED : QZ_S_ACK);
 });

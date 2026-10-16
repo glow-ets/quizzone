@@ -18,6 +18,14 @@ let qzDA = 0;
 let qzDB = 0;
 let qzDSince = 0;               // control.millis() when the state last changed (drives blinking and flashes)
 
+// Local test mode (touch logo, micro:bit V2): nothing is sent or received on the radio, and a pressed
+// key just shows its letter. Touch the logo again to leave it.
+let qzLocal = false;
+let qzLocalSince = 0;
+let qzLogoAt = -1000;
+let qzWaitRelease = false;      // after leaving test mode, keys still held are not fed to the game logic
+const qzLocalTest = new QzLocalTest();
+
 class TeamHal implements QzTeamHal {
     radioSend(bytes: number[]): void {
         const b = control.createBuffer(bytes.length);
@@ -83,6 +91,7 @@ for (let i = 0; i < QZ_KEY_SOURCES.length; i++) {
 const qzTeam = new QzTeam(new TeamHal(), control.deviceSerialNumber(), QZ_KEY_SOURCES.length, control.millis());
 
 radio.onReceivedBuffer(function (b: Buffer) {
+    if (qzLocal) return;                 // test mode: incoming radio is ignored
     qzTeam.onPacket(qzBufToArray(b), control.millis());
 });
 
@@ -93,8 +102,18 @@ control.inBackground(function () {
     while (true) {
         const now = control.millis();
         for (let i = 0; i < QZ_KEY_SOURCES.length; i++) down[i] = qzReadKey(QZ_KEY_SOURCES[i]);
-        qzTeam.onKeys(down, now);
-        qzTeam.tick(now);
+        if (qzLocal) {
+            // test mode: no game logic, hence no radio transmission at all
+            if (qzLocalTest.onKeys(down, now) && qzSoundQueue.length < 6) qzSoundQueue.push(QZ_S_LOCK);
+        } else {
+            let anyDown = false;
+            for (let i = 0; i < down.length; i++) if (down[i]) anyDown = true;
+            if (!anyDown) qzWaitRelease = false;
+            if (!qzWaitRelease) {
+                qzTeam.onKeys(down, now);
+                qzTeam.tick(now);
+            }
+        }
         basic.pause(2);
     }
 });
@@ -103,7 +122,9 @@ control.inBackground(function () {
 control.inBackground(function () {
     while (true) {
         // Never blocks and never keeps a copy of the state: draw whatever the CURRENT state looks like now.
-        const frame = qzFrame(qzDMode, qzDA, qzDB, control.millis() - qzDSince);
+        const t = control.millis();
+        const frame = qzLocal ? qzFrame(QZ_D_LOCAL, qzLocalTest.show, 0, t - qzLocalSince)
+                              : qzFrame(qzDMode, qzDA, qzDB, t - qzDSince);
         const key = frame.join("");
         if (key != qzLastFrame) { qzLastFrame = key; qzDraw(frame); }
         basic.pause(20);
@@ -117,4 +138,18 @@ control.inBackground(function () {
             pins.setAudioPinEnabled(false);
         } else basic.pause(10);
     }
+});
+
+// Touch logo toggles local test mode (the logo exists on micro:bit V2 only).
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    const now = control.millis();
+    if (now - qzLogoAt < 400) return;    // a touch can report twice
+    qzLogoAt = now;
+    qzLocal = !qzLocal;
+    qzLocalSince = now;
+    qzLocalTest.show = 0;
+    qzLocalTest.until = 0;
+    qzLocalTest.prev = [];
+    qzWaitRelease = !qzLocal;
+    if (qzSoundQueue.length < 6) qzSoundQueue.push(qzLocal ? QZ_S_ASSIGNED : QZ_S_ACK);
 });

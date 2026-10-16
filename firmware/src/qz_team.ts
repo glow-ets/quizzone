@@ -21,6 +21,7 @@ const QZ_D_CLOSED = 4;    // a = answer 1..5 or 0
 const QZ_D_RESULT = 5;    // a = 1 correct, 2 wrong, 3 no answer
 const QZ_D_NOLINK = 6;
 const QZ_D_IDENT = 7;
+const QZ_D_LOCAL = 8;      // local test mode: a = letter 1..5 to show, 0 = none (blinking "!")
 
 // Sounds requested from the glue (played by a background fiber).
 const QZ_S_LOCK = 1;
