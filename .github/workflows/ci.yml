@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  firmware:
+    name: Firmware (Node)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: firmware
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22        # needs >= 22.13 (node:module stripTypeScriptTypes)
+          # Once firmware/package-lock.json is committed, uncomment:
+          # cache: npm
+          # cache-dependency-path: firmware/package-lock.json
+
+      # Switch to `npm ci` after committing package-lock.json.
+      - run: npm install --no-audit --no-fund
+
+      - name: Firmware logic tests (virtual radio world)
+        run: npm test
+
+      # The type check needs MakeCode's declaration files (shallow clones of three public repos, ~100 MB).
+      # They are unpinned (latest master), so a MakeCode change can in principle break this step.
+      - name: Cache MakeCode declarations
+        uses: actions/cache@v4
+        with:
+          path: firmware/.cache
+          key: makecode-decls-${{ github.run_id }}
+          restore-keys: makecode-decls-
+
+      - name: Type-check against MakeCode declarations
+        run: npm run typecheck
+
+      - name: Build MakeCode projects
+        run: npm run build
+
+      - name: Upload built firmware sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-dist
+          path: firmware/dist/
+
+  server:
+    name: Server (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      # The end-to-end tests run the real firmware logic through Node (firmware/tools/bridge.mjs).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Unit, server and end-to-end tests
+        run: python -m unittest discover -s server/tests -t . -v
+        env:
+          PYTHONPATH: server
+
+  ui:
+    name: Browser smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: python -m pip install playwright
+      - run: python -m playwright install --with-deps chromium
+
+      - name: UI test
+        run: python -m unittest server.tests.test_ui -v
+        env:
+          PYTHONPATH: server
