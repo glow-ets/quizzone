@@ -35,7 +35,10 @@ function render() {
   lastKey = key;
   if (S.phase === "lobby" || (!q && S.phase !== "final")) {
     st.className = "stage center";
-    st.innerHTML = `<div class="halo"><img src="/static/img/glow-script.svg" alt="glow"></div><div class="series">${esc(S.series)}</div><h1>${esc(S.title)}</h1>
+    const word = S.series || S.title;
+    const letters = [...word].map((ch, i) => ch === " " ? `<i class="sp"></i>` : `<span style="--i:${i}">${esc(ch)}</span>`).join("");
+    st.innerHTML = `<div class="wordart" role="img" aria-label="${esc(word)}">${letters}</div>
+      ${S.series ? `<h1>${esc(S.title)}</h1>` : ""}
       <div class="sub">${esc(t("screen.lobby", { n: S.teams.filter(x => x.online).length }))}</div>`;
     return;
   }

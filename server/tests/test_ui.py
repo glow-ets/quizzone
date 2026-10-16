@@ -49,7 +49,9 @@ class UiSmoke(unittest.TestCase):
         scr, e1 = self.page(1920, 1080, "/")
         ctl, e2 = self.page(1280, 900, "/control")
         mob, e3 = self.page(390, 800, "/control")
-        scr.wait_for_selector(".halo")
+        scr.wait_for_selector(".wordart")
+        self.assertEqual(scr.get_attribute(".wordart", "aria-label"), self.e.quiz.series)         # the series name is the hero
+        self.assertEqual(scr.locator(".wordart span").count(), len(self.e.quiz.series))
         self.assertIn("hidden", scr.get_attribute("#net", "class") or "")        # link banner off while healthy
         self.assertEqual(self.overflow(scr), [0, 0])
 

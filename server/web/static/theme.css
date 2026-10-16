@@ -118,9 +118,23 @@ button, input, select { font: inherit; color: inherit; }
 .center h1 { font-size: 8vmin; margin: 0; line-height: 1.05; text-wrap: balance; }
 .center .series { color: var(--glow-deep); font-size: 3.6vmin; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .center .sub { color: var(--muted); font-size: 3vmin; }
-.center .halo { height: 30vmin; margin: 0 auto; animation: breathe 3.5s ease-in-out infinite; }
-.center .halo img { height: 100%; width: auto; }
-@keyframes breathe { 50% { transform: scale(.96); } }
+/* the series name as wordart: chunky comic letters, thick outline, stepped 3-D shadow, each letter in a brand colour */
+.wordart { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: .6vmin;
+           font-family: var(--display); font-size: 25vmin; line-height: 1; padding: 2vmin 0 3.5vmin; }
+.wordart .sp { width: 6vmin; }
+.wordart span { --c: var(--a); display: inline-block; color: var(--c);
+  -webkit-text-stroke: 1.3vmin var(--ink); paint-order: stroke fill; letter-spacing: .02em;
+  text-shadow: .25vmin .25vmin 0 var(--ink), .5vmin .5vmin 0 var(--ink), .75vmin .75vmin 0 var(--ink), 1vmin 1vmin 0 var(--ink),
+               1.25vmin 1.25vmin 0 var(--ink), 1.5vmin 1.5vmin 0 var(--ink), 1.75vmin 1.75vmin 0 var(--ink), 2vmin 2vmin 0 var(--ink),
+               2.25vmin 2.25vmin 0 var(--ink), 2.5vmin 2.5vmin 0 var(--ink);
+  transform: translateY(var(--y, 0)) rotate(var(--r, 0deg)); animation: bob 2.6s ease-in-out infinite; animation-delay: calc(var(--i) * -.22s); }
+.wordart span:nth-child(4n+1) { --c: var(--a); --r: -4deg; --y: .6vmin; }
+.wordart span:nth-child(4n+2) { --c: var(--b); --r: 3deg;  --y: -.8vmin; }
+.wordart span:nth-child(4n+3) { --c: var(--c-teal, #00b198); --r: -2deg; --y: .4vmin; }
+.wordart span:nth-child(4n+4) { --c: var(--d); --r: 4deg;  --y: -.5vmin; }
+@keyframes bob { 50% { transform: translateY(calc(var(--y, 0) - 1.4vmin)) rotate(calc(var(--r, 0deg) * -1)); } }
+.center h1 { margin-top: 1vmin; }
+.screen.is-lobby .top .title { visibility: hidden; }
 
 .podium { display: grid; gap: 1.2vmin; align-content: start; width: min(90vmin, 92%); margin: 0 auto; }
 .prow { display: grid; grid-template-columns: 8vmin 1fr auto; align-items: center; gap: 2vmin; background: var(--bg-2);
@@ -202,7 +216,6 @@ label.changed { color: var(--glow-deep); font-weight: 700; }
 label.changed .def { font-weight: 400; color: var(--muted); }
 
 /* lobby: the big logo is in the middle, so the small one in the header would only repeat it */
-.screen.is-lobby .top .brand { visibility: hidden; }
 /* compact buttons inside tables */
 td .btn { padding: 3px 10px; min-height: 32px; font-size: 14px; }
 
@@ -215,5 +228,5 @@ td .btn { padding: 3px 10px; min-height: 32px; font-size: 14px; }
 .lamp .sc { font-size: 2.6vmin; font-weight: 700; }
 .qcat { font-size: 2.8vmin; letter-spacing: .08em; }
 .ctl h1 { font-size: 24px; } .ctl h2 { font-size: 20px; } .btn.primary { font-size: 22px; }
-.center h1 { font-size: 9vmin; }
+.center h1 { font-size: 8vmin; }
 .qtext { font-weight: 600; }
