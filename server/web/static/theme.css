@@ -4,9 +4,11 @@
    Light on purpose: a projector in a lit room washes a dark picture out to grey, while dark text on white stays
    readable. So: strong contrast (ink on white, no light-grey text), thick outlines, big type, and every state
    (answered, right, wrong, low time) carries a symbol or a word as well as a colour. */
-@font-face { font-family: "Poppins"; font-weight: 400; font-style: normal; font-display: swap; src: url("/static/fonts/Poppins-Regular.woff") format("woff"); }
-@font-face { font-family: "Poppins"; font-weight: 500; font-style: normal; font-display: swap; src: url("/static/fonts/Poppins-Medium.woff") format("woff"); }
-@font-face { font-family: "Poppins"; font-weight: 700; font-style: normal; font-display: swap; src: url("/static/fonts/Poppins-Bold.woff") format("woff"); }
+@font-face { font-family: "Fredoka"; font-weight: 400; font-style: normal; font-display: swap; src: url("/static/fonts/Fredoka-Regular.woff") format("woff"); }
+@font-face { font-family: "Fredoka"; font-weight: 500; font-style: normal; font-display: swap; src: url("/static/fonts/Fredoka-Medium.woff") format("woff"); }
+@font-face { font-family: "Fredoka"; font-weight: 600; font-style: normal; font-display: swap; src: url("/static/fonts/Fredoka-SemiBold.woff") format("woff"); }
+@font-face { font-family: "Fredoka"; font-weight: 700; font-style: normal; font-display: swap; src: url("/static/fonts/Fredoka-Bold.woff") format("woff"); }
+@font-face { font-family: "Bangers"; font-weight: 400; font-style: normal; font-display: swap; src: url("/static/fonts/Bangers-Regular.woff") format("woff"); }
 
 :root {
   --bg: #ffffff;
@@ -32,7 +34,8 @@
   --c: #00b198; --on-c: #181818;
   --d: #408bd1; --on-d: #181818;
   --e: #8a4fd0; --on-e: #ffffff;
-  --font: "Poppins", "Avenir Next", "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
+  --font: "Fredoka", "Avenir Next", "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
+  --display: "Bangers", "Fredoka", "Impact", system-ui, sans-serif;   /* game-show headings, numbers, wordart */
   --radius: 16px;
   --shadow: 0 2px 10px rgba(120, 30, 60, .10);
 }
@@ -202,3 +205,15 @@ label.changed .def { font-weight: 400; color: var(--muted); }
 .screen.is-lobby .top .brand { visibility: hidden; }
 /* compact buttons inside tables */
 td .btn { padding: 3px 10px; min-height: 32px; font-size: 14px; }
+
+/* game-show type: Bangers for headings, numbers and the key letters, Fredoka for everything you read */
+.top .badge, .timer .num, .ans .key, .ans .count, .qnum, .qcat, .prow .rk, .prow .pt, .center h1,
+.center .series, .ctl h1, .ctl h2, .btn.primary { font-family: var(--display); font-weight: 400; letter-spacing: .03em; }
+.timer .num { font-size: 9vmin; }
+.ans .key { font-size: 4.6vmin; }
+.top .badge { font-size: 3.6vmin; }
+.lamp .sc { font-size: 2.6vmin; font-weight: 700; }
+.qcat { font-size: 2.8vmin; letter-spacing: .08em; }
+.ctl h1 { font-size: 24px; } .ctl h2 { font-size: 20px; } .btn.primary { font-size: 22px; }
+.center h1 { font-size: 9vmin; }
+.qtext { font-weight: 600; }
