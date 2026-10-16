@@ -2,10 +2,10 @@ import json
 import os
 import random
 
-from contromossa import protocol as P
-from contromossa.content import load_quiz
-from contromossa.engine import Config, Engine
-from contromossa.store import Store
+from quizzone import protocol as P
+from quizzone.content import load_quiz
+from quizzone.engine import Config, Engine
+from quizzone.store import Store
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 CONTENT = os.path.join(ROOT, "content")

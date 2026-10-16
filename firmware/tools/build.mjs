@@ -23,9 +23,9 @@ if (fs.existsSync(dist)) {
 }
 
 const titles = {
-  team: 'Contromossa quiz - team device',
-  base: 'Contromossa quiz - base station (plug into the PC)',
-  probe: 'Contromossa quiz - pin probe / self-test',
+  team: 'Quizzone - team device',
+  base: 'Quizzone - base station (plug into the PC)',
+  probe: 'Quizzone - pin probe / self-test',
 };
 for (const [name, files] of Object.entries(PROJECTS)) {
   const dir = path.join(dist, name);
@@ -41,7 +41,7 @@ for (const [name, files] of Object.entries(PROJECTS)) {
   });
   const usesRadio = name !== 'probe';
   fs.writeFileSync(path.join(dir, 'pxt.json'), JSON.stringify({
-    name: `contromossa-${name}`,
+    name: `quizzone-${name}`,
     version: '0.1.0',
     description: titles[name],
     dependencies: usesRadio ? { core: '*', radio: '*' } : { core: '*' },
@@ -49,7 +49,7 @@ for (const [name, files] of Object.entries(PROJECTS)) {
     supportedTargets: ['microbit'],
     preferredEditor: 'tsprj',
   }, null, 4));
-  fs.writeFileSync(path.join(dir, 'README.md'), `# ${titles[name]}\n\nPart of the Contromossa quiz system. See the repository README and docs/HARDWARE.md.\n`);
+  fs.writeFileSync(path.join(dir, 'README.md'), `# ${titles[name]}\n\nPart of the Quizzone system. See the repository README and docs/HARDWARE.md.\n`);
   fs.writeFileSync(path.join(dist, `${name}.ts`), single);
   console.log(`built dist/${name}/ and dist/${name}.ts`);
 }

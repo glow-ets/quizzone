@@ -1,5 +1,5 @@
 // =============================================================================
-//  Contromossa quiz - shared settings. Must be IDENTICAL on every team device
+//  Quizzone - shared settings. Must be IDENTICAL on every team device
 //  and on the base station (the micro:bit plugged into the computer).
 // =============================================================================
 

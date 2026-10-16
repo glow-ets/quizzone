@@ -47,7 +47,7 @@ class QzBase {
 
     // Counters reported in the "H" line
     cOverflow = 0;    // software queue overflow (dropped oldest)
-    cForeign = 0;     // radio packets that are not valid Contromossa packets
+    cForeign = 0;     // radio packets that are not valid Quizzone packets
     cBadLine = 0;     // serial lines with bad checksum / unparsable
     cRxOk = 0;        // valid team packets received
 

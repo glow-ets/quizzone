@@ -5,9 +5,9 @@ import tempfile
 import threading
 import unittest
 
-from contromossa import engine as E
-from contromossa import protocol as P
-from contromossa.engine import CommandError
+from quizzone import engine as E
+from quizzone import protocol as P
+from quizzone.engine import CommandError
 from .helpers import Clock, advance, bring_online, hello, make_engine, run_question, t_line
 
 # question 1 "atmo": correct answer 2 (index 1), 20 s, +100, -50, speed bonus 50
@@ -527,7 +527,7 @@ class Content(unittest.TestCase):
         self.assertIn("atmosphere", e.quiz.localized(q, "en")["text"])
 
     def test_invalid_content_reports_all_problems(self):
-        from contromossa.content import ContentError, load_quiz
+        from quizzone.content import ContentError, load_quiz
         with tempfile.TemporaryDirectory() as d:
             os.makedirs(os.path.join(d, "texts"))
             with open(os.path.join(d, "quiz.json"), "w") as f:

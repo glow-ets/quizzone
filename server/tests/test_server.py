@@ -6,10 +6,10 @@ import threading
 import time
 import unittest
 
-from contromossa import protocol as P
-from contromossa.links import LoopbackTransport
-from contromossa.server import App
-from contromossa.sim import SimTransport
+from quizzone import protocol as P
+from quizzone.links import LoopbackTransport
+from quizzone.server import App
+from quizzone.sim import SimTransport
 from .helpers import make_engine, t_line
 
 

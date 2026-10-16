@@ -8,8 +8,8 @@ try:
 except ImportError:                                  # pragma: no cover
     sync_playwright = None
 
-from contromossa.server import App
-from contromossa.sim import SimTransport
+from quizzone.server import App
+from quizzone.sim import SimTransport
 from .helpers import make_engine
 
 

@@ -49,6 +49,10 @@ The pin list in `firmware/src/team_main.ts` (`QZ_KEY_SOURCES`) is a **placeholde
 
 Alternatively use the micro:bit's own A/B buttons (`QZ_BTN_A`, `QZ_BTN_B`) for a first test.
 
+## Dual Unit Button
+
+Will use this. TODO some info.
+
 ## Unit Key wiring 
 
 Not used now, maybe we will for other purposes.
@@ -73,8 +77,7 @@ node firmware/tools/build.mjs      # writes firmware/dist/{team,base,probe}.ts a
 * Group/band/power are in `qz_config.ts` (QZ_GROUP=77, QZ_BAND=25). If another event nearby uses the same group, change
   both team and base builds.
 * The firmware is plain MakeCode static TypeScript. It type-checks against the real MakeCode declarations
-  (`node firmware/tools/typecheck.mjs`), but **the MakeCode editor itself could not be run in the development
-  sandbox**: compile it once in the editor before the event and report any message.
+  (`node firmware/tools/typecheck.mjs`), but **the MakeCode editor itself could not be run in the development sandbox**: compile it once in the editor before the event and report any message.
 
 ## Assigning teams
 

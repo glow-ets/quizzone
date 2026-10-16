@@ -236,7 +236,7 @@ export function parseLine(line) {
 
 // Minimal PC-side model: enough of the real server's behaviour (accept first
 // valid answer per slot, ack mask, state line every 250 ms) to exercise the firmware.
-// The real engine lives in server/contromossa/engine.py and has its own tests.
+// The real engine lives in server/quizzone/engine.py and has its own tests.
 export class SimPc {
   constructor(world, opts = {}) {
     this.w = world;

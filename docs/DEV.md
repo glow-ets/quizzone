@@ -1,5 +1,16 @@
 # Quizzone scientifico (Contromossa) - Development
 
+## Description
+
+Quiz system for ~15 teams: 
+
+- micro:bit on an edu:bit with [M5Stack Unit Dual Button](https://docs.m5stack.com/en/unit/Unit_Dual_Button) buttons
+- a base micro:bit connected via USB
+- a Python server (standard library only, plus `pyserial` for the base)
+- display and control in the browser
+- First button press = answer locked in.
+
+
 ## Setting
 
 Glow ETS (https://glow.earth) is a cultural association that offers, organizes, and manages educational activities and cultural events with the aim of generating innovative ideas and projects capable of making an impact on society and the Trentino region.
@@ -14,16 +25,6 @@ Glow ETS (https://glow.earth) is a cultural association that offers, organizes, 
 > - Crediamo nell’elemento umano
 > - Partiamo dal basso
 
-
-## Description
-
-Quiz system for ~15 teams: 
-
-- micro:bit on an edu:bit with [M5Stack Unit Dual Button](https://docs.m5stack.com/en/unit/Unit_Dual_Button) buttons
-- a base micro:bit connected via USB
-- a Python server (standard library only, plus `pyserial` for the base)
-- display and control in the browser
-- First button press = answer locked in.
 
 ## Done and tested without hardware
 

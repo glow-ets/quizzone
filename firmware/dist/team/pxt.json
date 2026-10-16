@@ -1,7 +1,7 @@
 {
-    "name": "contromossa-team",
+    "name": "quizzone-team",
     "version": "0.1.0",
-    "description": "Contromossa quiz - team device",
+    "description": "Quizzone - team device",
     "dependencies": {
         "core": "*",
         "radio": "*"

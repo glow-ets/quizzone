@@ -38,7 +38,7 @@ Record every result in a copy of this table. A failed step blocks the event unti
 | 2 | Pins | Probe firmware, mode 1, each Unit Key in each connector (docs/HARDWARE.md) | every connector gives one stable `P<n>`, idle pins read 1 |
 | 3 | Bounce | Probe mode 2, 20 presses per key, hard and soft | at most 2 toggles, all within 10 ms; otherwise raise `QZ_DEBOUNCE_MS` |
 | 4 | Speaker/LED | Probe button B; flash team firmware, assign, press | tone audible across the room; letters readable |
-| 5 | Base | Plug the base, `python3 -m contromossa ports`, then `run` | micro:bit listed; control panel shows "Base collegata" and group 77/band 25 |
+| 5 | Base | Plug the base, `python3 -m quizzone ports`, then `run` | micro:bit listed; control panel shows "Base collegata" and group 77/band 25 |
 | 6 | Assignment | Power on all 15 devices, auto-assign, use "Fai lampeggiare" on each | 15 distinct teams, no warning signs within 10 s |
 | 7 | Blast x10 | Control panel "Avvia prova", ten times in a row | every run "Tutto arrivato"; note the max delay; investigate any run above 1.5 s |
 | 8 | Human simultaneous press | All teams press the same letter on a countdown, 5 questions | every team locked and acknowledged (steady letter) within 1 s |

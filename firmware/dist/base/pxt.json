@@ -1,7 +1,7 @@
 {
-    "name": "contromossa-base",
+    "name": "quizzone-base",
     "version": "0.1.0",
-    "description": "Contromossa quiz - base station (plug into the PC)",
+    "description": "Quizzone - base station (plug into the PC)",
     "dependencies": {
         "core": "*",
         "radio": "*"

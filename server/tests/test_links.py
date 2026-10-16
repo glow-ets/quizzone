@@ -7,7 +7,7 @@ import time
 import types
 import unittest
 
-from contromossa import links
+from quizzone import links
 from .helpers import ROOT
 
 WEB = os.path.join(ROOT, "server", "web")
@@ -130,7 +130,7 @@ class I18n(unittest.TestCase):
                 src = f.read()
             used |= set(re.findall(r"""["'`]((?:ctl|act|phase|cfg|rep|confirm|screen|team|err)\.[a-z_]+)["'`]""", src))
             used |= set(re.findall(r'data-i="([^"]+)"', src))
-        with open(os.path.join(ROOT, "server", "contromossa", "engine.py"), encoding="utf-8") as f:
+        with open(os.path.join(ROOT, "server", "quizzone", "engine.py"), encoding="utf-8") as f:
             eng = f.read()
         used |= set(re.findall(r"""["']((?:log|err)\.[a-z_]+)["']""", eng))
         used |= {"cfg." + k for k in ("close_when_all_answered", "read_first", "allow_negative", "auto_assign", "teams",

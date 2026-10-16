@@ -3,7 +3,7 @@ import os
 import random
 import unittest
 
-from contromossa import protocol as P
+from quizzone import protocol as P
 from .helpers import ROOT
 
 V = json.load(open(os.path.join(ROOT, "protocol", "vectors.json")))

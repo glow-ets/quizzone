@@ -128,7 +128,7 @@ class App:
 class Handler(BaseHTTPRequestHandler):
     app: App
     protocol_version = "HTTP/1.1"
-    server_version = "Contromossa"
+    server_version = "Quizzone"
 
     def log_message(self, fmt, *args):          # quiet; the engine log is the record
         pass

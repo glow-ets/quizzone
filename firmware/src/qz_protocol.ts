@@ -1,5 +1,5 @@
 // =============================================================================
-//  Contromossa quiz - wire protocol (radio packets + serial lines).
+//  Quizzone - wire protocol (radio packets + serial lines).
 //  Spec: protocol/PROTOCOL.md.  Pure functions only: no MakeCode API here, so
 //  the same file runs in the Node test harness.
 //  MakeCode static-TS rules followed: no enums, no namespaces, no modules.
@@ -90,7 +90,7 @@ function qzEncTargeted(type: number, target: number, arg: number): number[] {
         (target >> 24) & 255, arg & 255];
 }
 
-// Returns null for anything that is not a well-formed Contromossa packet.
+// Returns null for anything that is not a well-formed Quizzone packet.
 function qzDecode(b: number[]): QzMsg {
     if (b == null || b.length < 2 || b[0] != QZ_MAGIC) return null;
     const m = new QzMsg();

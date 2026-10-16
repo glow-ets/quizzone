@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quizzone"
+version = "0.1.0"
+description = "Quizzone scientifico: quiz server for micro:bit team devices"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Glow ETS" }]
+# The server itself uses only the standard library.
+dependencies = []
+
+[project.optional-dependencies]
+# Needed only to talk to the real base station over USB (not for --sim or tests).
+serial = ["pyserial>=3.5"]
+# Only for server/tests/test_ui.py (skipped when missing).
+test = ["playwright>=1.40"]
+
+[project.scripts]
+quizzone = "quizzone.__main__:main"
+
+[tool.setuptools]
+packages = ["quizzone"]
+
+# NOTE: content/, web/ and data/ live next to the package, not inside it, and the code finds them
+# relative to the source tree. Use an editable install from a checkout:
+#     pip install -e "server[serial]"
+# A plain `pip install server/` would copy only the Python code and fail to find the web files.

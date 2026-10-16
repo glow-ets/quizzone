@@ -7,11 +7,11 @@ import tempfile
 import time
 import unittest
 
-from contromossa.engine import Config, Engine
-from contromossa.content import load_quiz
-from contromossa.links import TcpTransport
-from contromossa.server import App
-from contromossa.store import Store
+from quizzone.engine import Config, Engine
+from quizzone.content import load_quiz
+from quizzone.links import TcpTransport
+from quizzone.server import App
+from quizzone.store import Store
 from .helpers import CONTENT, ROOT
 
 NODE = shutil.which("node")

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Real-time bridge: runs the REAL firmware logic (team + base) inside the virtual radio
 // world, paced by the wall clock, and exposes the base station's USB serial over TCP.
-// The Python server connects with `python -m contromossa run --tcp 127.0.0.1:PORT`.
+// The Python server connects with `python -m quizzone run --tcp 127.0.0.1:PORT`.
 //
 // Extra control lines (start with '!', not part of the real protocol):
 //   !press <team 1..N> <answer 1..5> [delayMs]   press that key on a virtual team device

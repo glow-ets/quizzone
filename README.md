@@ -1,4 +1,4 @@
-# Quizzone scientifico - Contromossa
+# Quizzone scientifico
 
 Quiz a squadre per circa 15 gruppi: la domanda e le risposte (3-5) compaiono sul grande schermo, ogni squadra ha un dispositivo (micro:bit su edu:bit con pulsanti M5Stack) e **il primo tasto premuto blocca la risposta**. Risposte sbagliate tolgono punti. Il server gira su Windows, macOS e Linux.
 
@@ -15,10 +15,10 @@ squadre (micro:bit, radio) ))) base (micro:bit via USB) --- PC (server Python) -
 ## Uso
 
 ```
-PYTHONPATH=server python3 -m contromossa validate           # controlla le domande
-PYTHONPATH=server python3 -m contromossa ports              # elenca le porte (cerca [micro:bit])
-PYTHONPATH=server python3 -m contromossa run                # avvia con la base collegata
-PYTHONPATH=server python3 -m contromossa run --sim 12       # DEMO senza hardware: 12 squadre virtuali
+PYTHONPATH=server python3 -m quizzone validate           # controlla le domande
+PYTHONPATH=server python3 -m quizzone ports              # elenca le porte (cerca [micro:bit])
+PYTHONPATH=server python3 -m quizzone run                # avvia con la base collegata
+PYTHONPATH=server python3 -m quizzone run --sim 12       # DEMO senza hardware: 12 squadre virtuali
 ```
 
 Poi apri nel browser del PC:
@@ -39,7 +39,7 @@ Se il server si ferma, riavvialo: punteggi, squadre e domanda in corso vengono r
 * [`content/texts/it.json`](content/texts/it.json): testo, risposte e spiegazione (lingua di riferimento, obbligatoria).
 * [`content/texts/en.json`](content/texts/en.json): traduzione, anche parziale: le domande mancanti escono in italiano.
 * Interfaccia: [`server/web/i18n/it.json`](server/web/i18n/it.json), [`en.json`](server/web/i18n/en.json). 
-Per una nuova lingua copia `en.json` e traduci i valori.* `python3 -m contromossa validate` segnala errori (numero di risposte diverso, id sconosciuti...).
+Per una nuova lingua copia `en.json` e traduci i valori.* `python3 -m quizzone validate` segnala errori (numero di risposte diverso, id sconosciuti...).
 
 ## Aspetto
 
@@ -53,7 +53,7 @@ non era raggiungibile durante lo sviluppo, quindi lo stile non e' stato confront
 | [`firmware/src`](firmware/src/) | firmware MakeCode (TypeScript): squadra, base, sonda |
 | [`firmware/tools`](firmware/tools/) | build, controllo tipi, ponte di simulazione in tempo reale |
 | [`firmware/tests`](firmware/tests/) | simulatore radio e test del firmware |
-| [`server/contromossa`](server/contromossa/) | motore di gioco, protocollo, server HTTP |
+| [`server/quizzone`](server/quizzone/) | motore di gioco, protocollo, server HTTP |
 | [`server/web`](server/web/) | schermo, controllo, traduzioni |
 | [`protocol`](protocol/) | specifica e vettori di test condivisi |
 | [`docs`](docs/) | hardware e protocollo di collaudo |

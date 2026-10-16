@@ -1,7 +1,7 @@
 {
-    "name": "contromossa-probe",
+    "name": "quizzone-probe",
     "version": "0.1.0",
-    "description": "Contromossa quiz - pin probe / self-test",
+    "description": "Quizzone - pin probe / self-test",
     "dependencies": {
         "core": "*"
     },

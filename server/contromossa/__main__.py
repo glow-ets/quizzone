@@ -1,4 +1,4 @@
-"""Command line: python -m contromossa run | validate | ports"""
+"""Command line: python -m quizzone run | validate | ports"""
 from __future__ import annotations
 
 import argparse
@@ -12,7 +12,6 @@ from .server import App
 from .store import Store
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-
 
 def _content(a):
     return a.content or os.path.join(ROOT, "content")
@@ -82,7 +81,7 @@ def cmd_run(a) -> int:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(prog="contromossa")
+    ap = argparse.ArgumentParser(prog="quizzone")
     ap.add_argument("--content", help="cartella con quiz.json e texts/")
     sub = ap.add_subparsers(dest="cmd")
     r = sub.add_parser("run", help="avvia il server")

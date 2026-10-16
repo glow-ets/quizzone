@@ -1,4 +1,4 @@
-# Contromossa quiz - protocol specification
+# Quizzone - protocol specification
 
 Two links, one rule: **the device measures time, the PC decides.**
 
@@ -7,7 +7,7 @@ Two links, one rule: **the device measures time, the PC decides.**
  team device              <--radio--  base                     <--serial--  PC
 ```
 
-Everything below is implemented twice (`firmware/src/qz_protocol.ts`, `server/contromossa/protocol.py`) and
+Everything below is implemented twice (`firmware/src/qz_protocol.ts`, `server/quizzone/protocol.py`) and
 both are checked against `protocol/vectors.json`, a file of hand-computed byte strings.
 
 ## 1. Design rules

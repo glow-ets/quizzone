@@ -1,3 +1,3 @@
-# Contromossa quiz - team device
+# Quizzone - team device
 
-Part of the Contromossa quiz system. See the repository README and docs/HARDWARE.md.
+Part of the Quizzone system. See the repository README and docs/HARDWARE.md.
