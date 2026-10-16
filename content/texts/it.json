@@ -33,12 +33,11 @@
   "text": "Che cosa misura un anemometro?",
   "answers": [
    "La pressione atmosferica",
-   "L'umidità dell'aria",
+   "La direzione del vento",
    "La velocità del vento",
-   "La temperatura",
-   "La radiazione solare"
+   "L'umidità dell'aria"
   ],
-  "explanation": "L'anemometro misura la velocità del vento."
+  "explanation": "L'anemometro misura la velocità del vento; la direzione si legge con la banderuola."
  },
  "elettrone": {
   "text": "Quale particella ha carica elettrica negativa?",

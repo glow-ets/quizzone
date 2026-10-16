@@ -23,12 +23,11 @@
   "text": "What does an anemometer measure?",
   "answers": [
    "Air pressure",
-   "Humidity",
+   "Wind direction",
    "Wind speed",
-   "Temperature",
-   "Solar radiation"
+   "Humidity"
   ],
-  "explanation": "An anemometer measures wind speed."
+  "explanation": "An anemometer measures wind speed; wind direction is read from a wind vane."
  },
  "nobel": {
   "text": "Which scientist won Nobel Prizes in two different scientific fields?",

@@ -4,10 +4,11 @@ import random
 import tempfile
 import threading
 import unittest
+from dataclasses import replace
 
 from quizzone import engine as E
 from quizzone import protocol as P
-from quizzone.engine import CommandError
+from quizzone.engine import CommandError, Config
 from .helpers import Clock, advance, bring_online, hello, make_engine, run_question, t_line
 
 # question 1 "atmo": correct answer 2 (index 1), 20 s, +100, -50, speed bonus 50
@@ -189,6 +190,8 @@ class Flow(unittest.TestCase):
 
     def test_five_answer_question_accepts_five(self):
         e = self.e
+        # the shipped content has 4 answers per question; the protocol itself supports 5
+        e.quiz.questions[3] = replace(e.quiz.questions[3], n_answers=5)
         e.cmd_goto(3)
         e.cmd_next()
         self.assertEqual(e.q.n_answers, 5)
