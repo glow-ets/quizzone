@@ -53,8 +53,12 @@ Per una nuova lingua copia `en.json` e traduci i valori.* `python3 -m quizzone v
 
 ## Aspetto
 
-Tutti i colori sono variabili in `server/web/static/theme.css`. I colori attuali sono provvisori: il sito glow.earth
-non era raggiungibile durante lo sviluppo, quindi lo stile non e' stato confrontato con il sito.
+Stile ripreso dal sito glow.earth (`docs/glow-website-branding.pdf`): rosa `#e61f5a`, arancio, verde acqua e blu del
+sito, font Poppins (inclusa in `server/web/static/fonts/`, licenza OFL), logo in `server/web/static/img/`.
+Lo sfondo e' chiaro di proposito: con il proiettore in una sala illuminata un fondo scuro si "lava" e diventa grigio,
+mentre testo scuro su bianco resta leggibile. Per questo: contrasto alto, bordi spessi, testo grande, e ogni stato
+(risposta data, giusta, sbagliata, poco tempo) ha anche un simbolo o una parola, non solo un colore.
+Tutti i colori sono variabili in `server/web/static/theme.css`.
 
 ## Struttura
 

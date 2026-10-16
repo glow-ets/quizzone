@@ -28,13 +28,14 @@ function render() {
   $("net").classList.toggle("hidden", S.link_ok && connected);
   $("lamps").innerHTML = S.phase === "final" ? "" : lampsHtml(S);
   const q = S.question, st = $("stage");
+  $("root").classList.toggle("is-lobby", S.phase === "lobby" || (!q && S.phase !== "final"));
   // Structure changes only when the phase/question changes; timers update separately.
   const key = [S.phase, q && q.id, S.reveal ? 1 : 0, S.lang].join("|");
   if (key === lastKey) { updateLive(); return; }
   lastKey = key;
   if (S.phase === "lobby" || (!q && S.phase !== "final")) {
     st.className = "stage center";
-    st.innerHTML = `<div class="halo"></div><div class="series">${esc(S.series)}</div><h1>${esc(S.title)}</h1>
+    st.innerHTML = `<div class="halo"><img src="/static/img/glow-script.svg" alt="glow"></div><div class="series">${esc(S.series)}</div><h1>${esc(S.title)}</h1>
       <div class="sub">${esc(t("screen.lobby", { n: S.teams.filter(x => x.online).length }))}</div>`;
     return;
   }
