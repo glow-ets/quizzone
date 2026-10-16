@@ -1,0 +1,17 @@
+{
+  "name": "contromossa-firmware-tools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Build, type-check and test tooling for the Contromossa quiz micro:bit firmware (MakeCode TypeScript)",
+  "type": "module",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "test": "node --no-warnings --test tests/firmware.test.mjs",
+    "typecheck": "node tools/typecheck.mjs",
+    "build": "node tools/build.mjs",
+    "check": "npm run test && npm run typecheck && npm run build"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3"
+  }
+}

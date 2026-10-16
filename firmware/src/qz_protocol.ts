@@ -58,6 +58,7 @@ class QzMsg {
     // ASSIGN / IDENT
     target = 0;     // device serial number as int32
     arg = 0;        // slot (ASSIGN) or pattern (IDENT)
+    constructor() { }
 }
 
 function qzClamp16(v: number): number {

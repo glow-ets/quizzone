@@ -12,7 +12,15 @@ import { PROJECTS } from './typecheck.mjs';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const src = path.resolve(here, '../src');
 const dist = path.resolve(here, '../dist');
-fs.rmSync(dist, { recursive: true, force: true });
+
+// Clear contents without removing the dir itself (plays nice with bind mounts)
+if (fs.existsSync(dist)) {
+  for (const entry of fs.readdirSync(dist)) {
+    fs.rmSync(path.join(dist, entry), { recursive: true, force: true });
+  }
+} else {
+  fs.mkdirSync(dist, { recursive: true });
+}
 
 const titles = {
   team: 'Contromossa quiz - team device',

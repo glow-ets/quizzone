@@ -15,6 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -22,6 +23,13 @@ const fwDir = path.resolve(here, '..');
 const srcDir = path.join(fwDir, 'src');
 const cache = process.env.PXT_SRC ? path.resolve(process.env.PXT_SRC) : path.join(fwDir, '.cache');
 
+// Prefer the TypeScript pinned in firmware/package.json (npm install); fall back to a global `tsc`.
+function runTsc(args) {
+  let local = null;
+  try { local = createRequire(path.join(fwDir, 'package.json')).resolve('typescript/bin/tsc'); } catch { /* not installed locally */ }
+  return local ? execFileSync(process.execPath, [local, ...args], { encoding: 'utf8' })
+               : execFileSync('tsc', args, { encoding: 'utf8' });
+}
 function sh(cmd, args, cwd) { execFileSync(cmd, args, { cwd, stdio: 'inherit' }); }
 function ensureClones() {
   fs.mkdirSync(cache, { recursive: true });
@@ -78,7 +86,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const cfgPath = path.join(tmp, `tsconfig.${name}.json`);
     fs.writeFileSync(cfgPath, JSON.stringify(cfg));
     let out = '';
-    try { execFileSync('tsc', ['-p', cfgPath], { encoding: 'utf8' }); }
+    try { runTsc(['-p', cfgPath]); }
     catch (e) { out = (e.stdout || '') + (e.stderr || ''); }
     // MakeCode's own library sources contain a few errors when checked outside the pxt toolchain
     // (e.g. hex`` literals); only errors located in OUR files count.

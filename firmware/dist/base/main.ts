@@ -39,7 +39,7 @@ serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
     qzBase.onSerialLine(serial.readUntil(serial.delimiters(Delimiters.NewLine)), control.millis());
 });
 
-basic.showString("B");
+basic.showString("Q");
 
 control.inBackground(function () {
     let blink = false;
@@ -50,9 +50,22 @@ control.inBackground(function () {
         if (now - lastBlink >= 500) {
             lastBlink = now;
             blink = !blink;
-            // centre dot blinks while the PC is talking to us, corner dot otherwise
-            if (qzBase.serverAlive(now)) { led.unplot(0, 0); if (blink) led.plot(2, 2); else led.unplot(2, 2); }
-            else { led.unplot(2, 2); if (blink) led.plot(0, 0); else led.unplot(0, 0); }
+            // usually Q, with added blinking ! if server not alive
+            if (qzBase.serverAlive(now)) { 
+                basic.showString("Q");
+            } else {
+                if (blink){
+                    basic.showString("Q");
+                } else {
+                    basic.showLeds(`
+. # # . #
+# . . # #
+# . . # #
+. # # . .
+. . # # #
+`); 
+                }
+            }
         }
         basic.pause(1);
     }

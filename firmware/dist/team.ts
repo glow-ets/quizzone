@@ -94,6 +94,7 @@ class QzMsg {
     // ASSIGN / IDENT
     target = 0;     // device serial number as int32
     arg = 0;        // slot (ASSIGN) or pattern (IDENT)
+    constructor() { }
 }
 
 function qzClamp16(v: number): number {
@@ -602,13 +603,10 @@ class QzTeam {
 // =============================================================================
 
 // ---- EDIT ME: which input drives each answer (A, B, C, D, E) ---------------
-// PLACEHOLDER PIN LIST - NOT VERIFIED AGAINST THE BOARD. Run the "probe"
-// firmware first (docs/HARDWARE.md) and write the pins you actually measured.
-// Use QZ_BTN_A / QZ_BTN_B to use the micro:bit's own A/B buttons (the edu:bit's
-// two big buttons are reported to be wired in parallel with them).
+
 const QZ_BTN_A = 1000;
 const QZ_BTN_B = 1001;
-const QZ_KEY_SOURCES: number[] = [DigitalPin.P8, DigitalPin.P12, DigitalPin.P14, DigitalPin.P15, DigitalPin.P16];
+const QZ_KEY_SOURCES: number[] = [QZ_BTN_A, QZ_BTN_B, DigitalPin.P8, DigitalPin.P12]; 
 const QZ_VOLUME = 200;          // 0..255
 
 // ---- hardware access --------------------------------------------------------

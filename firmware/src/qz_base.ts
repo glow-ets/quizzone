@@ -22,6 +22,7 @@ class QzRxItem {
     rssi = 0;
     at = 0;
     msg: QzMsg = null;
+    constructor() { }
 }
 
 class QzBase {
