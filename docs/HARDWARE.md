@@ -2,16 +2,39 @@
 
 ## Per team
 
-* 1 micro:bit on an edu:bit board (battery or USB power bank - prefer a power bank on the table).
-* 1-5 M5Stack Unit Key buttons (one per answer: A, B, C, D and E for 5-answer questions), plugged into edu:bit
-  Grove connectors or wired with crocodile clips, plus the Lego console built by the team.
-* Feedback: 5x5 LED display (letter of the locked answer, countdown bar, result) and the edu:bit speaker.
+* 1 micro:bit v2 on an edu:bit board with USB power bank.
+* 2 M5Stack Dual Unit Button (mapped to A B, and C D), plugged into edu:bit Grove connectors, plus the Lego console built by the team.
+* Feedback: 5x5 LED display (letter of the locked answer, countdown bar, result) and the edu:bit speaker (sound feedback from microbit alone might be too low).
 
 ## Base station (one)
 
 * 1 micro:bit plugged in the PC by USB. Nothing else. It does not need an edu:bit.
 
-## Step 0: find out which pins the connectors use (do this first)
+
+## Edubit pins mapping
+
+micro:bit's own A/B buttons (`QZ_BTN_A` / `QZ_BTN_B`): 
+
+- the edu:bit's two big buttons are reported to be wired in parallel with them
+- M5stack Dual Unit:  blu: A,  red: B
+
+P8 and P12 correspond to the infrared sensor on the edubit - note that:
+
+- both P8 and P12 need to be set as pull up during init
+- if the infrared is kept attached, from my experiments it seems not to interphere provided that the knob 
+  is cranked max clockwise (you should see its red led turns on). As undesired effect,  in simpler separate setups I noticed the system will think the 'button' is pressed until you actually plug in the M5stack dual button - this might provoke annoying sounds if the system is programmed to blip on answer.
+-  M5stack Dual Unit: blu: C   red: D
+
+P14, P15 and P16 correspond the to semaphore on the edubit, note that: 
+
+- For now, we DON'T use them  
+- P14 and P15 need to be set as pull up  during init
+- P16 needs to be set to logic state 1 since there is no automatic Vcc in that third channel pos (Claude told me it gives more power than just pulling up)
+- AND as far as my testing go the semaphore needs to be physically removed as it interferes.
+- `[DigitalPin.P14, DigitalPin.P15, DigitalPin.P16]`
+
+
+### How to check pins
 
 The pin list in `firmware/src/team_main.ts` (`QZ_KEY_SOURCES`) is a **placeholder**. To fill it in:
 
@@ -26,7 +49,9 @@ The pin list in `firmware/src/team_main.ts` (`QZ_KEY_SOURCES`) is a **placeholde
 
 Alternatively use the micro:bit's own A/B buttons (`QZ_BTN_A`, `QZ_BTN_B`) for a first test.
 
-## Unit Key wiring
+## Unit Key wiring 
+
+Not used now, maybe we will for other purposes.
 
 | wire   | use                                   |
 |--------|---------------------------------------|
