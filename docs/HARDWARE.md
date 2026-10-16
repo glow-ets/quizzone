@@ -10,7 +10,6 @@
 
 * 1 micro:bit plugged in the PC by USB. Nothing else. It does not need an edu:bit.
 
-
 ## Edubit pins mapping
 
 micro:bit's own A/B buttons (`QZ_BTN_A` / `QZ_BTN_B`): 
