@@ -230,9 +230,9 @@ td .btn { padding: 3px 10px; min-height: 32px; font-size: 14px; }
 .confetti i { position: absolute; top: -4vmin; border-radius: 20%; opacity: .85; animation: fall linear infinite; }
 @keyframes fall { to { transform: translateY(112vh) rotate(var(--spin, 360deg)); } }
 .ftitle { text-align: center; font-family: var(--display); font-size: 6.4vmin; letter-spacing: .06em; line-height: 1; color: var(--glow);
-          -webkit-text-stroke: .5vmin var(--ink); paint-order: stroke fill; text-shadow: .5vmin .5vmin 0 var(--ink); margin-top: .5vmin; }
+          -webkit-text-stroke: .5vmin var(--ink); paint-order: stroke fill; text-shadow: .5vmin .5vmin 0 var(--ink); margin: 1vmin 0 3vmin; }
 
-.heroes { display: flex; justify-content: center; align-items: flex-end; gap: 3vmin; }
+.heroes { display: flex; justify-content: center; align-items: flex-end; gap: 3vmin; margin-bottom: 2.4vmin; }
 .hero { flex: 0 1 28vmin; display: grid; justify-items: center; gap: 0; padding: 1vmin 1.6vmin 1.4vmin; border: .5vmin solid var(--ink);
         border-radius: 2.4vmin; box-shadow: .8vmin .8vmin 0 var(--ink); text-align: center; min-width: 0; }
 .hero.gold { background: linear-gradient(165deg, #fff7c4, #ffd54a 55%, #f2a900); }
@@ -250,8 +250,10 @@ td .btn { padding: 3px 10px; min-height: 32px; font-size: 14px; }
 .heroes.classic .hero.r3 { transform: translateY(0); }
 @keyframes shine { 50% { transform: translateY(-1vmin) rotate(-3deg); } }
 
-.podium { display: grid; grid-auto-flow: column; grid-template-rows: repeat(var(--rows, 6), auto); grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr));
-          gap: .8vmin 2vmin; align-content: start; width: min(var(--cols, 1) * 62vmin, 100%); margin: 0 auto; }
+.podium { display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 62vmin)); justify-content: center; gap: 2vmin; margin: 0 auto; }
+.pcol { display: flex; flex-direction: column; gap: .8vmin; min-width: 0; }
+.scene { flex: 1 1 0; min-height: 0; display: flex; justify-content: center; align-items: flex-end; margin-top: 1vmin; overflow: hidden; }
+.scene svg { height: 100%; width: 100%; max-height: 40vmin; }
 .prow { --h: 340; display: grid; grid-template-columns: 5vmin 1fr auto; align-items: center; gap: 1.6vmin; min-width: 0;
         background: linear-gradient(90deg, hsl(var(--h) 90% 88%), hsl(var(--h) 100% 97%) 75%); border: .3vmin solid hsl(var(--h) 55% 55%);
         border-radius: 1.4vmin; padding: .35vmin 2vmin .35vmin .6vmin; font-size: 2.7vmin; font-weight: 600; }

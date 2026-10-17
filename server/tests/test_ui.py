@@ -171,6 +171,29 @@ class UiSmoke(unittest.TestCase):
                 e.phase, e.scores, e.q, e.cursor = saved[0], saved[1], saved[2], saved[3]
                 e._bump()
 
+    def test_final_scoreboard_splits_the_teams_evenly_in_columns(self):
+        from quizzone import engine as E
+        e = self.e
+        saved = (e.phase, dict(e.scores), e.q, e.cursor)
+        try:
+            with e.lock:
+                e.scores = {i: 0 for i in range(15)}                    # a 15-way tie: no medals, plain list
+                e.phase, e.q = E.FINAL, None
+                e._bump()
+            scr, errs = self.page(1920, 1080, "/")
+            scr.wait_for_selector(".pcol")
+            sizes = scr.eval_on_selector_all(".pcol", "cols => cols.map(c => c.children.length)")
+            self.assertEqual(sizes, [5, 5, 5], "15 teams: three columns of five")
+            self.assertEqual(scr.evaluate("document.querySelector('.ftitle').getBoundingClientRect().bottom + 10 < document.querySelector('.podium').getBoundingClientRect().top"), True,
+                             "the title keeps its distance from the list")
+            self.assertGreater(scr.evaluate("document.querySelector('.scene svg').getBoundingClientRect().height"), 150, "the free space holds the illustration")
+            self.assertEqual(self.overflow(scr), [0, 0])
+            self.assertEqual(errs, [])
+        finally:
+            with e.lock:
+                e.phase, e.scores, e.q, e.cursor = saved[0], saved[1], saved[2], saved[3]
+                e._bump()
+
     def test_reset_settings_button_and_highlight_of_changed_values(self):
         ctl, errs = self.page(1280, 900, "/control")
         ctl.wait_for_selector("input[data-cfgnum=tolerance_ms]")
