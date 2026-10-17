@@ -54,7 +54,7 @@ Per una nuova lingua copia `en.json` e traduci i valori.* `python3 -m quizzone v
 ## Aspetto
 
 Stile ripreso dal sito glow.earth (`docs/glow-website-branding.pdf`): rosa `#e61f5a`, arancio, verde acqua e blu del
-sito; font piu' giocosi da quiz (Fredoka per i testi, Bangers per titoli e numeri, incluse in `server/web/static/fonts/`, licenza OFL); logo in `server/web/static/img/`.
+sito; font piu' giocosi da quiz (Fredoka per i testi, Carter One per titoli e numeri, incluse in `server/web/static/fonts/`, licenza OFL); logo in `server/web/static/img/`.
 Lo sfondo e' chiaro di proposito: con il proiettore in una sala illuminata un fondo scuro si "lava" e diventa grigio,
 mentre testo scuro su bianco resta leggibile. Per questo: contrasto alto, bordi spessi, testo grande, e ogni stato
 (risposta data, giusta, sbagliata, poco tempo) ha anche un simbolo o una parola, non solo un colore.

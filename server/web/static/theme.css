@@ -8,7 +8,7 @@
 @font-face { font-family: "Fredoka"; font-weight: 500; font-style: normal; font-display: swap; src: url("/static/fonts/Fredoka-Medium.woff") format("woff"); }
 @font-face { font-family: "Fredoka"; font-weight: 600; font-style: normal; font-display: swap; src: url("/static/fonts/Fredoka-SemiBold.woff") format("woff"); }
 @font-face { font-family: "Fredoka"; font-weight: 700; font-style: normal; font-display: swap; src: url("/static/fonts/Fredoka-Bold.woff") format("woff"); }
-@font-face { font-family: "Bangers"; font-weight: 400; font-style: normal; font-display: swap; src: url("/static/fonts/Bangers-Regular.woff") format("woff"); }
+@font-face { font-family: "Carter One"; font-weight: 400; font-style: normal; font-display: swap; src: url("/static/fonts/CarterOne-Regular.woff") format("woff"); }
 
 :root {
   --bg: #ffffff;
@@ -35,7 +35,7 @@
   --d: #408bd1; --on-d: #181818;
   --e: #8a4fd0; --on-e: #ffffff;
   --font: "Fredoka", "Avenir Next", "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
-  --display: "Bangers", "Fredoka", "Impact", system-ui, sans-serif;   /* game-show headings, numbers, wordart */
+  --display: "Carter One", "Fredoka", system-ui, sans-serif;   /* quiz headings, numbers, wordart */
   --radius: 16px;
   --shadow: 0 2px 10px rgba(120, 30, 60, .10);
 }
@@ -118,21 +118,23 @@ button, input, select { font: inherit; color: inherit; }
 .center h1 { font-size: 8vmin; margin: 0; line-height: 1.05; text-wrap: balance; }
 .center .series { color: var(--glow-deep); font-size: 3.6vmin; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .center .sub { color: var(--muted); font-size: 3vmin; }
-/* the series name as wordart: chunky comic letters, thick outline, stepped 3-D shadow, each letter in a brand colour */
-.wordart { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: .6vmin;
-           font-family: var(--display); font-size: 25vmin; line-height: 1; padding: 2vmin 0 3.5vmin; }
+/* the series name as wordart: rounded Carter One letters, thick outline, stepped 3-D shadow, brand colours;
+   at rest it is still, every few seconds a soft light sweeps over the letters from left to right */
+.wordart { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: .4vmin;
+           font-family: var(--display); font-size: 21vmin; line-height: 1; padding: 2vmin 0 3.5vmin; }
 .wordart .sp { width: 6vmin; }
 .wordart span { --c: var(--a); display: inline-block; color: var(--c);
-  -webkit-text-stroke: 1.3vmin var(--ink); paint-order: stroke fill; letter-spacing: .02em;
+  -webkit-text-stroke: 1.3vmin var(--ink); paint-order: stroke fill; letter-spacing: .01em;
   text-shadow: .25vmin .25vmin 0 var(--ink), .5vmin .5vmin 0 var(--ink), .75vmin .75vmin 0 var(--ink), 1vmin 1vmin 0 var(--ink),
                1.25vmin 1.25vmin 0 var(--ink), 1.5vmin 1.5vmin 0 var(--ink), 1.75vmin 1.75vmin 0 var(--ink), 2vmin 2vmin 0 var(--ink),
                2.25vmin 2.25vmin 0 var(--ink), 2.5vmin 2.5vmin 0 var(--ink);
-  transform: translateY(var(--y, 0)) rotate(var(--r, 0deg)); animation: bob 2.6s ease-in-out infinite; animation-delay: calc(var(--i) * -.22s); }
-.wordart span:nth-child(4n+1) { --c: var(--a); --r: -4deg; --y: .6vmin; }
-.wordart span:nth-child(4n+2) { --c: var(--b); --r: 3deg;  --y: -.8vmin; }
-.wordart span:nth-child(4n+3) { --c: var(--c-teal, #00b198); --r: -2deg; --y: .4vmin; }
-.wordart span:nth-child(4n+4) { --c: var(--d); --r: 4deg;  --y: -.5vmin; }
-@keyframes bob { 50% { transform: translateY(calc(var(--y, 0) - 1.4vmin)) rotate(calc(var(--r, 0deg) * -1)); } }
+  transform: translateY(var(--y, 0)); animation: sweep 7s ease-in-out infinite; animation-delay: calc(var(--i) * .13s); }
+.wordart span:nth-child(4n+1) { --c: var(--a); --y: .4vmin; }
+.wordart span:nth-child(4n+2) { --c: var(--b); --y: -.4vmin; }
+.wordart span:nth-child(4n+3) { --c: var(--c-teal, #00b198); --y: .2vmin; }
+.wordart span:nth-child(4n+4) { --c: var(--d); --y: -.2vmin; }
+@keyframes sweep { 0%, 14%, 100% { filter: none; } 7% { filter: brightness(1.28) saturate(1.1); } }
+@media (prefers-reduced-motion: reduce) { .wordart span { animation: none; } }
 .center h1 { margin-top: 1vmin; }
 .screen.is-lobby .top .title { visibility: hidden; }
 
@@ -208,15 +210,16 @@ label.changed .def { font-weight: 400; color: var(--muted); }
 /* compact buttons inside tables */
 td .btn { padding: 3px 10px; min-height: 32px; font-size: 14px; }
 
-/* game-show type: Bangers for headings, numbers and the key letters, Fredoka for everything you read */
+/* quiz type: Carter One for numbers, key letters and screen headings, Fredoka for everything you read (and for the control panel) */
 .top .badge, .timer .num, .ans .key, .ans .count, .qnum, .qcat, .prow .rk, .prow .pt, .hrank, .hpt, .ftitle, .center h1,
-.center .series, .ctl h1, .ctl h2, .btn.primary { font-family: var(--display); font-weight: 400; letter-spacing: .03em; }
+.center .series { font-family: var(--display); font-weight: 400; letter-spacing: .03em; }
+.ctl h1, .ctl h2, .btn.primary { font-family: var(--font); font-weight: 700; letter-spacing: 0; }
 .timer .num { font-size: 9vmin; }
 .ans .key { font-size: 4.6vmin; }
 .top .badge { font-size: 3.6vmin; }
 .lamp .sc { font-size: 2.6vmin; font-weight: 700; }
 .qcat { font-size: 2.8vmin; letter-spacing: .08em; }
-.ctl h1 { font-size: 24px; } .ctl h2 { font-size: 20px; } .btn.primary { font-size: 22px; }
+.ctl h1 { font-size: 24px; } .ctl h2 { font-size: 20px; } .btn.primary { font-size: 18px; }
 .center h1 { font-size: 8vmin; }
 .qtext { font-weight: 600; }
 
