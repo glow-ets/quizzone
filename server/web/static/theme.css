@@ -20,8 +20,8 @@
   --glow: #e01c56;            /* brand pink (a hair deeper than the site's #e61f5a so white text on it passes AA) */
   --glow-deep: #c9184e;       /* pink text on white, hover */
   --on-glow: #ffffff;
-  --ok: #00b198;              /* teal fills */
-  --ok-text: #006b5b;
+  --ok: #b10099;              /* teal fills */
+  --ok-text: #68006b;
   --ok-bg: #d4f3ed;
   --bad: #c0002f;
   --bad-bg: #fde0e7;
@@ -29,11 +29,11 @@
   --warn-text: #7a4300;
   --warn-bg: #ffe9cc;
   /* the four (five) answer keys */
-  --a: #e01c56; --on-a: #ffffff;
-  --b: #f78d1e; --on-b: #181818;
-  --c: #00b198; --on-c: #181818;
-  --d: #408bd1; --on-d: #181818;
-  --e: #8a4fd0; --on-e: #ffffff;
+  --a: #ed5de5; --on-a: #fefefe;
+  --b: #f28eed; --on-b: #fffefe;
+  --c: #f761eb; --on-c: #fefdfd;
+  --d: #e472eb; --on-d: #f7f4f4;
+  --e: #9767d1; --on-e: #ffffff;
   --font: "Fredoka", "Avenir Next", "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
   --display: "Carter One", "Fredoka", system-ui, sans-serif;   /* quiz headings, numbers, wordart */
   --radius: 16px;
@@ -53,6 +53,7 @@ button, input, select { font: inherit; color: inherit; }
 /* ---------- big screen ---------- */
 .screen { height: 100vh; display: grid; grid-template-rows: auto 1fr auto; gap: 2.2vmin; padding: 3vmin 4vmin;
           font-size: 2.6vmin; overflow: hidden; }
+
 .top { display: flex; align-items: center; justify-content: space-between; gap: 2vmin; color: var(--muted); }
 .top .brand { display: flex; align-items: center; gap: 2.4vmin; min-width: 0; }
 .top .brand img { height: 7vmin; width: auto; }
@@ -131,12 +132,11 @@ button, input, select { font: inherit; color: inherit; }
   transform: translateY(var(--y, 0)); animation: sweep 7s ease-in-out infinite; animation-delay: calc(var(--i) * .13s); }
 .wordart span:nth-child(4n+1) { --c: var(--a); --y: .4vmin; }
 .wordart span:nth-child(4n+2) { --c: var(--b); --y: -.4vmin; }
-.wordart span:nth-child(4n+3) { --c: var(--c-teal, #00b198); --y: .2vmin; }
+.wordart span:nth-child(4n+3) { --c: var(--c-teal, #edb8f2); --y: .2vmin; }
 .wordart span:nth-child(4n+4) { --c: var(--d); --y: -.2vmin; }
 @keyframes sweep { 0%, 14%, 100% { filter: none; } 7% { filter: brightness(1.28) saturate(1.1); } }
 @media (prefers-reduced-motion: reduce) { .wordart span { animation: none; } }
-.center h1 { margin-top: 1vmin; }
-.screen.is-lobby .top .title { visibility: hidden; }
+.center h1 { margin-top: 1vmin; font-family: var(--display) !important}
 
 
 /* ---------- control panel ---------- */
@@ -163,7 +163,7 @@ button, input, select { font: inherit; color: inherit; }
 .btn.danger:hover { background: var(--bad-bg); }
 .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .now { display: grid; gap: 6px; }
-.now .q { font-size: 18px; font-weight: 700; }
+.now .q {font-size: 18px;font-weight: 700;}
 table { border-collapse: collapse; width: 100%; }
 th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
 th { color: var(--muted); font-weight: 700; font-size: 13px; }
@@ -210,16 +210,20 @@ label.changed .def { font-weight: 400; color: var(--muted); }
 /* compact buttons inside tables */
 td .btn { padding: 3px 10px; min-height: 32px; font-size: 14px; }
 
+.screen.is-lobby .top  { visibility: hidden; }
+
+
 /* quiz type: Carter One for numbers, key letters and screen headings, Fredoka for everything you read (and for the control panel) */
 .top .badge, .timer .num, .ans .key, .ans .count, .qnum, .qcat, .prow .rk, .prow .pt, .hrank, .hpt, .ftitle, .center h1,
-.center .series { font-family: var(--display); font-weight: 400; letter-spacing: .03em; }
-.ctl h1, .ctl h2, .btn.primary { font-family: var(--font); font-weight: 700; letter-spacing: 0; }
+.center .series { font-family: "Fredoka"; font-weight: 400; letter-spacing: .03em; }
+.ctl h1, .ctl h2, .btn.primary {font-family: --var(font);font-weight: 700;letter-spacing: 0;}
 .timer .num { font-size: 9vmin; }
 .ans .key { font-size: 4.6vmin; }
 .top .badge { font-size: 3.6vmin; }
 .lamp .sc { font-size: 2.6vmin; font-weight: 700; }
 .qcat { font-size: 2.8vmin; letter-spacing: .08em; }
 .ctl h1 { font-size: 24px; } .ctl h2 { font-size: 20px; } .btn.primary { font-size: 18px; }
+.ctl {  font-family: system-ui, sans-serif;}
 .center h1 { font-size: 8vmin; }
 .qtext { font-weight: 600; }
 
@@ -255,9 +259,9 @@ td .btn { padding: 3px 10px; min-height: 32px; font-size: 14px; }
 .scene { flex: 1 1 0; min-height: 0; display: flex; justify-content: center; align-items: flex-end; margin-top: 1vmin; overflow: hidden; }
 .scene svg { height: 100%; width: 100%; max-height: 40vmin; }
 .prow { --h: 340; display: grid; grid-template-columns: 5vmin 1fr auto; align-items: center; gap: 1.6vmin; min-width: 0;
-        background: linear-gradient(90deg, hsl(var(--h) 90% 88%), hsl(var(--h) 100% 97%) 75%); border: .3vmin solid hsl(var(--h) 55% 55%);
+        background: linear-gradient(90deg, hsl(0deg 0% 100%), hsl(0deg 0% 99.08%) 75%); border: .3vmin solid hsl(340deg 9.34% 86.04%);
         border-radius: 1.4vmin; padding: .35vmin 2vmin .35vmin .6vmin; font-size: 2.7vmin; font-weight: 600; }
-.prow .rk { display: grid; place-items: center; width: 4.2vmin; height: 4.2vmin; border-radius: 50%; background: hsl(var(--h) 72% 36%); color: #fff;
+.prow .rk { display: grid; place-items: center; width: 4.2vmin; height: 4.2vmin; border-radius: 50%; background: #7b0074; color: #fff;
             font-size: 2.6vmin; font-variant-numeric: tabular-nums; }
 .prow .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .prow .pt { font-size: 2.8vmin; font-weight: 700; font-variant-numeric: tabular-nums; font-family: var(--font); letter-spacing: 0; }
