@@ -34,6 +34,7 @@
   --c: #f761eb; --on-c: #fefdfd;
   --d: #e472eb; --on-d: #f7f4f4;
   --e: #9767d1; --on-e: #ffffff;
+  --ans: #a50f55; --on-ans: #ffffff;   /* answer keys: white on a deep pink, 7.5:1 so it still reads on a washed-out projector */
   --font: "Fredoka", "Avenir Next", "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
   --display: "Carter One", "Fredoka", system-ui, sans-serif;   /* quiz headings, numbers, wordart */
   --radius: 16px;
@@ -85,9 +86,7 @@ button, input, select { font: inherit; color: inherit; }
             color: var(--on); background: var(--hue); }
 .ans .count { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 700; font-size: 3.4vmin; }
 .ans .bar { position: absolute; left: 0; bottom: 0; height: 1vmin; background: var(--hue); width: 0; transition: width .6s ease; }
-.ans:nth-child(1) { --hue: var(--a); --on: var(--on-a); } .ans:nth-child(2) { --hue: var(--b); --on: var(--on-b); }
-.ans:nth-child(3) { --hue: var(--c); --on: var(--on-c); } .ans:nth-child(4) { --hue: var(--d); --on: var(--on-d); }
-.ans:nth-child(5) { --hue: var(--e); --on: var(--on-e); }
+.ans { --hue: var(--ans); --on: var(--on-ans); }               /* every answer key is the same dark pink with white letters */
 .reveal .ans { box-shadow: none; border-color: var(--line); color: var(--muted); }
 .reveal .ans .key { opacity: .5; }
 .reveal .ans .bar { opacity: .6; }
