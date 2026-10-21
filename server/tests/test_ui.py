@@ -129,6 +129,17 @@ class UiSmoke(unittest.TestCase):
         ctl.wait_for_function("document.querySelector('#devices').innerText.includes('0000ABCD')")
         self.assertEqual([m for m in errs if "409" not in m], [])
 
+    def test_lobby_wordart_stays_on_one_line_in_any_window_shape(self):
+        self.e.cmd_reset_game(confirm=True)
+        for w, h in ((1920, 1080), (2000, 1330), (1500, 1000), (1280, 1024), (1024, 768)):
+            scr, errs = self.page(w, h, "/")
+            scr.wait_for_selector(".wordart span")
+            tops = scr.eval_on_selector_all(".wordart span", "els => els.map(e => e.offsetTop)")
+            self.assertEqual(len(set(tops)), 1, f"{w}x{h}: the wordart wrapped")
+            self.assertEqual(scr.evaluate("document.querySelector('.wordart').scrollWidth <= innerWidth"), True, f"{w}x{h}")
+            self.assertEqual(self.overflow(scr), [0, 0], f"{w}x{h}")
+            scr.close()
+
     def test_team_lamps_use_two_balanced_rows_of_equal_boxes(self):
         self.e.cmd_reset_game(confirm=True)                   # earlier tests may have left the game on the final screen
         scr, errs = self.page(1920, 1080, "/")

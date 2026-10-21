@@ -122,7 +122,8 @@ button, input, select { font: inherit; color: inherit; }
 /* the series name as wordart: rounded Carter One letters, thick outline, stepped 3-D shadow, brand colours;
    at rest it is still, every few seconds a soft light sweeps over the letters from left to right */
 .wordart { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: .4vmin;
-           font-family: var(--display); font-size: 21vmin; line-height: 1; padding: 2vmin 0 3.5vmin; }
+           /* sized by the height (vmin) but never wider than the screen: --n is the number of characters, so a 3:2 window or F11 keeps one line */
+           font-family: var(--display); font-size: min(21vmin, calc(125vw / var(--n, 11))); line-height: 1; padding: 2vmin 0 3.5vmin; }
 .wordart .sp { width: 6vmin; }
 .wordart span { --c: var(--a); display: inline-block; color: var(--c);
   -webkit-text-stroke: 1.3vmin var(--ink); paint-order: stroke fill; letter-spacing: .01em;

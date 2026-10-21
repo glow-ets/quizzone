@@ -131,7 +131,7 @@ function render() {
     st.className = "stage center";
     const word = S.series || S.title;
     const letters = [...word].map((ch, i) => ch === " " ? `<i class="sp"></i>` : `<span style="--i:${i}">${esc(ch)}</span>`).join("");
-    st.innerHTML = `<div class="wordart" role="img" aria-label="${esc(word)}">${letters}</div>
+    st.innerHTML = `<div class="wordart" role="img" aria-label="${esc(word)}" style="--n:${[...word].length}">${letters}</div>
       ${S.series ? `<h1>${esc(S.title)}</h1>` : ""}
       <div class="sub">${esc(t("screen.lobby", { n: S.teams.filter(x => x.online).length }))}</div>`;
     return;
