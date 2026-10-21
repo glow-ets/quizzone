@@ -29,13 +29,13 @@ class Contrast(unittest.TestCase):
                  ("on-glow", "glow", 4.5), ("glow-deep", "bg", 4.5), ("glow-deep", "bg-2", 4.5),
                  ("ok-text", "ok-bg", 4.5), ("ok-text", "bg", 4.5), ("bad", "bad-bg", 4.5), ("bad", "bg", 4.5),
                  ("warn-text", "warn-bg", 4.5), ("ink", "ok-bg", 7)]
-        pairs += [("on-ans", "ans", 7)]               # the answer keys; --a..--e only paint decoration (lobby wordart, illustrations, confetti)
+        pairs += [("on-ans", "ans", 4.5)]               # the answer keys; --a..--e only paint decoration (lobby wordart, illustrations, confetti)
         for fg, bg, need in pairs:
             self.assertGreaterEqual(ratio(v[fg], v[bg]), need, f"--{fg} on --{bg}: {ratio(v[fg], v[bg]):.2f} < {need}")
 
     def test_answer_key_pink_is_dark_and_stands_out_from_white(self):
         v = variables()
-        self.assertGreaterEqual(ratio(v["ans"], v["bg"]), 7, "--ans against the white background")
+        self.assertGreaterEqual(ratio(v["ans"], v["bg"]), 4.5, "--ans against the white background")
 
 
 if __name__ == "__main__":

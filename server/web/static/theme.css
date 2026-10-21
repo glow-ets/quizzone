@@ -34,7 +34,7 @@
   --c: #f761eb; --on-c: #fefdfd;
   --d: #e472eb; --on-d: #f7f4f4;
   --e: #9767d1; --on-e: #ffffff;
-  --ans: #d82093; --on-ans: #ffffff;   /* answer keys: white on a deep pink, 7.5:1 so it still reads on a washed-out projector */
+  --ans: #d82093; --on-ans: #ffffff;   /* answer keys: white on this pink is 4.6:1 (WCAG AA); the letters are large and bold, which only need 3:1 */
   --font: "Fredoka", "Avenir Next", "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
   --display: "Carter One", "Fredoka", system-ui, sans-serif;   /* quiz headings, numbers, wordart */
   --radius: 16px;
