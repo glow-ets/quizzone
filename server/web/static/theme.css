@@ -22,7 +22,7 @@
   --on-glow: #ffffff;
   --ok: #b10099;              /* teal fills */
   --ok-text: #68006b;
-  --ok-bg: #d4f3ed;
+  --ok-bg: #d7fc7b;
   --bad: #c0002f;
   --bad-bg: #fde0e7;
   --warn: #f78d1e;            /* orange */
@@ -34,7 +34,7 @@
   --c: #f761eb; --on-c: #fefdfd;
   --d: #e472eb; --on-d: #f7f4f4;
   --e: #9767d1; --on-e: #ffffff;
-  --ans: #a50f55; --on-ans: #ffffff;   /* answer keys: white on a deep pink, 7.5:1 so it still reads on a washed-out projector */
+  --ans: #d82093; --on-ans: #ffffff;   /* answer keys: white on a deep pink, 7.5:1 so it still reads on a washed-out projector */
   --font: "Fredoka", "Avenir Next", "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
   --display: "Carter One", "Fredoka", system-ui, sans-serif;   /* quiz headings, numbers, wordart */
   --radius: 16px;
@@ -80,10 +80,10 @@ button, input, select { font: inherit; color: inherit; }
 .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 2vmin; align-content: start; }
 .answers .ans:nth-child(5):last-child { grid-column: 1 / -1; }
 .ans { position: relative; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 2vmin;
-       padding: 2.2vmin 2.6vmin; background: var(--bg); border: .5vmin solid var(--hue); border-radius: var(--radius);
+       padding: 2.2vmin 2.6vmin; background: var(--bg); border: .5vmin solid #eac5ef; border-radius: var(--radius);
        font-size: 3.9vmin; font-weight: 500; min-height: 10vmin; overflow: hidden; box-shadow: var(--shadow); }
 .ans .key { display: grid; place-items: center; width: 7vmin; height: 7vmin; border-radius: 50%; font-weight: 700;
-            color: var(--on); background: var(--hue); }
+            color: var(--on); background-color: var(--ans); }
 .ans .count { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 700; font-size: 3.4vmin; }
 .ans .bar { position: absolute; left: 0; bottom: 0; height: 1vmin; background: var(--hue); width: 0; transition: width .6s ease; }
 .ans { --hue: var(--ans); --on: var(--on-ans); }               /* every answer key is the same dark pink with white letters */
